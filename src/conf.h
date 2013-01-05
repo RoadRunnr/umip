@@ -120,6 +120,8 @@ int conf_parse(struct mip6_config *c, int argc, char **argv);
 
 void conf_show(struct mip6_config *c);
 
+void conf_free(struct mip6_config *c);
+
 int yyparse(void);
 
 int yylex(void);

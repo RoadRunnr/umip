@@ -322,3 +322,10 @@ void conf_show(struct mip6_config *c)
 	dbg("DoRouteOptimizationCN = %s\n",
 	    CONF_BOOL_STR(c->DoRouteOptimizationCN));
 }
+
+void conf_free(struct mip6_config *c)
+{
+	if (c->config_file != NULL)
+		free(c->config_file);
+}
+

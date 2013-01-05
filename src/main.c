@@ -293,6 +293,7 @@ debug_failed:
 #ifdef ENABLE_VT
 vt_failed:
 #endif
+	conf_free(&conf);
 	syslog(LOG_INFO, "%s v%s stopped (%s)", PACKAGE_NAME, PACKAGE_VERSION,
 	       entity_string[conf.mip6_entity]);
 	closelog();
