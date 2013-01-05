@@ -297,6 +297,7 @@ static int policy_bind_acle_cleanup(void *data,
 				    __attribute__ ((unused)) void *arg)
 {
 	struct policy_bind_acl_entry *acl = data;
+	prefix_list_free(&acl->mob_net_prefixes);
 	free(acl);
 	return 0;
 }
