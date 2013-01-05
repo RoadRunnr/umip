@@ -508,9 +508,15 @@ static void bu_resend(struct tq_elem *tqe)
 	pthread_rwlock_wrlock(&mn_lock);
 	if (!task_interrupted()) {
 		struct bulentry *bule = tq_data(tqe, struct bulentry, tqe);
-		struct home_addr_info *hai = bule->home;
+		struct home_addr_info *hai = NULL;
 		int expired;
 
+		if (bule == NULL) {
+			MDBG("ERROR: BUL entry is NULL\n");
+			goto out;
+		}
+
+		hai = bule->home;
 		MDBG("Bul resend [%p] type %d\n",  bule, bule->type);
 
 		clock_gettime(CLOCK_REALTIME, &bule->lastsent);
@@ -541,6 +547,7 @@ static void bu_resend(struct tq_elem *tqe)
 			bul_update_timer(bule);
 		}
 	}
+out:
 	pthread_rwlock_unlock(&mn_lock);
 }
 
@@ -550,12 +557,18 @@ static void bu_refresh(struct tq_elem *tqe)
 	if (!task_interrupted()) {
 		struct bulentry *bule = tq_data(tqe, struct bulentry, tqe);
 		int expired;
+	
+		if (bule == NULL) {
+			MDBG("ERROR: BUL entry is NULL\n");
+			goto out;
+		}
+
 		MDBG("Bul refresh type: %d\n", bule->type);
 
 		clock_gettime(CLOCK_REALTIME, &bule->lastsent);
 
 		bule->delay = conf.InitialBindackTimeoutReReg_ts;
-	
+
 		expired = bu_lft_check(bule);
 
 		bule->seq++;
@@ -572,6 +585,7 @@ static void bu_refresh(struct tq_elem *tqe)
 				post_ba_bul_update(bule);	
 		}
 	}
+out:
 	pthread_rwlock_unlock(&mn_lock);
 }
 
