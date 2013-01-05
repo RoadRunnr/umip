@@ -65,7 +65,6 @@ static pthread_mutex_t bu_worker_mutex;
 static volatile unsigned long bu_worker_count = 0;
 static pthread_cond_t cond;
 
-LIST_HEAD(bu_worker_list);
 LIST_HEAD(ha_interfaces);
 
 static void ha_recv_ra(const struct icmp6_hdr *ih, ssize_t len,
@@ -867,7 +866,6 @@ static void *ha_recv_bu_worker(void *varg)
 	struct home_tnl_ops_parm p;
 
 	pthread_dbg("thread started");
-restart:	
 	home_ifindex = 0;
 	new = 0;
 	ba_flags = 0;
@@ -1118,14 +1116,6 @@ restart:
 		mpd_start_mpa(&bce->our_addr, &bce->peer_addr);
 out:
 	pthread_mutex_lock(&bu_worker_mutex);
-	if (!list_empty(&bu_worker_list)) {
-		struct list_head *l = bu_worker_list.next;
-		list_del(l);
-		free(arg);
-		arg = list_entry(l, struct ha_recv_bu_args, list);
-		pthread_mutex_unlock(&bu_worker_mutex);
-		goto restart;
-	}
 	if (--bu_worker_count == 0)
 		pthread_cond_signal(&cond);
 	if (arg->flags & HA_BU_F_THREAD_JOIN)
