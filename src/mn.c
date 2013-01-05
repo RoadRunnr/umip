@@ -1444,6 +1444,7 @@ static void clean_home_addr_info(struct home_addr_info *hai)
 		 IP6_RULE_PRIO_MIP6_HOA_OUT, RTN_UNICAST,
 		 &hai->hoa.addr, 128, &in6addr_any, 0, FIB_RULE_FIND_SADDR);
 	tunnel_del(hai->if_tunnel, NULL, NULL);
+	prefix_list_free(&hai->mob_net_prefixes);
 	dhaad_stop(hai);
 	free(hai);
 }	
