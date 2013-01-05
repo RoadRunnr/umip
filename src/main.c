@@ -31,6 +31,8 @@
 #include <sys/ioctl.h>
 #include <sys/wait.h>
 #include <sys/param.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <pthread.h>
 #include <fcntl.h>
 #include <unistd.h>
