@@ -46,6 +46,8 @@
 #include "debug.h"
 #include "util.h"
 #include "mipv6.h"
+#include "mn.h"
+#include "prefix.h"
 #ifdef ENABLE_VT
 #include "vt.h"
 #endif
@@ -195,7 +197,7 @@ static void conf_default(struct mip6_config *c)
 	c->vt_service = VT_DEFAULT_SERVICE;
 #endif
 	c->mip6_entity = MIP6_ENTITY_CN;
-	pmgr_init(NULL, &conf.pmgr);
+	pmgr_init(NULL, &c->pmgr);
 	INIT_LIST_HEAD(&c->net_ifaces);
 	INIT_LIST_HEAD(&c->bind_acl);
 	c->DefaultBindingAclPolicy = IP6_MH_BAS_ACCEPTED;
@@ -265,6 +267,8 @@ int conf_parse(struct mip6_config *c, int argc, char **argv)
 
 void conf_show(struct mip6_config *c)
 {
+	struct list_head *list;
+
 	/* Common options */
 	dbg("config_file = %s\n", c->config_file);
 #ifdef ENABLE_VT
@@ -277,7 +281,17 @@ void conf_show(struct mip6_config *c)
 				      "stderr"));
 	if (c->pmgr.so_path)
 		dbg("PolicyModulePath = %s\n", c->pmgr.so_path);
-	dbg("DefaultBindingAclPolicy = %u\n", c->DefaultBindingAclPolicy);
+	dbg("DefaultBindingAclPolicy = %s\n",
+			(c->DefaultBindingAclPolicy  == IP6_MH_BAS_ACCEPTED) ? "allow":"deny");
+	list_for_each(list, &c->bind_acl) {
+		struct policy_bind_acl_entry *acl;
+		acl = list_entry(list, struct policy_bind_acl_entry, list);
+		dbg("- HoA %x:%x:%x:%x:%x:%x:%x:%x (%d MNP): %s\n",
+			NIP6ADDR(&acl->hoa),
+			acl->mnp_count,
+			(acl->bind_policy == IP6_MH_BAS_ACCEPTED) ? "allow":"deny");
+	}
+
 	dbg("NonVolatileBindingCache = %s\n",
 	    CONF_BOOL_STR(c->NonVolatileBindingCache));
 	
@@ -325,7 +339,25 @@ void conf_show(struct mip6_config *c)
 
 void conf_free(struct mip6_config *c)
 {
-	if (c->config_file != NULL)
+	struct list_head *h, *nh;
+	struct home_addr_info *hai;
+
+	if (c->config_file) {
 		free(c->config_file);
+	}
+
+	pmgr_close(&c->pmgr);
+
+	/* For each home_addr_info, we have to remove the 
+	 * intern lists mob_net_prefix and ro_policy */
+	list_for_each_safe(h, nh, &c->home_addrs) {
+		hai = list_entry(h, struct home_addr_info, list);
+		list_del(h);
+
+		prefix_list_free(&hai->ro_policies);
+		prefix_list_free(&hai->mob_net_prefixes);
+
+		free(hai);
+	}
 }
 
