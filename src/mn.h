@@ -155,12 +155,7 @@ int mn_rr_post_home_handoff(void *bule, void *vcoa);
 
 void mn_start_ro(struct in6_addr *cn_addr, struct in6_addr *home_addr);
 
-static inline int mn_is_at_home(struct list_head *prefixes,
-				const struct in6_addr *home_prefix,
-				int home_plen)
-{
-	return prefix_list_find(prefixes, home_prefix, home_plen);
-}
-
+int mn_is_at_home(struct list_head *prefixes,
+		  const struct in6_addr *home_prefix, int home_plen);
 
 #endif /* __MN_H__ */

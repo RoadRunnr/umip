@@ -2187,6 +2187,13 @@ static struct md_coa *mn_get_coa(const struct home_addr_info *hai, int iif,
 	return best_coa;
 }
 
+int mn_is_at_home(struct list_head *prefixes,
+		  const struct in6_addr *home_prefix, int home_plen)
+{
+	return conf.NoHomeReturn ? 0 : prefix_list_find(prefixes, home_prefix,
+							home_plen);
+}
+
 static int mn_make_ho_verdict(const struct movement_event *me,
 			      const struct home_addr_info *hai, 
 			      struct md_router **next_rtr,

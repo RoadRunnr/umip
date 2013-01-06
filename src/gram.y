@@ -186,6 +186,7 @@ static void uerror(const char *fmt, ...) {
 %token		MNROUTERPROBETIMEOUT
 %token		MNDISCARDHAPARAMPROB
 %token		OPTIMISTICHANDOFF
+%token		NOHOMERETURN
 %token		HOMEPREFIX
 %token		HAACCEPTMOBRTR
 %token		ISMOBRTR
@@ -350,6 +351,10 @@ topdef		: MIP6ENTITY mip6entity ';'
 		| OPTIMISTICHANDOFF BOOL ';' 
 		{
 			conf.OptimisticHandoff = $2;
+		}
+		| NOHOMERETURN BOOL ';'
+		{
+			conf.NoHomeReturn = $2;
 		}
 		;
 

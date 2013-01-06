@@ -283,6 +283,7 @@ MnRouterProbes			{ return MNROUTERPROBES; }
 MnRouterProbeTimeout		{ return MNROUTERPROBETIMEOUT; }
 MnDiscardHaParamProb		{ return MNDISCARDHAPARAMPROB; }
 OptimisticHandoff		{ return OPTIMISTICHANDOFF; }
+NoHomeReturn                    { return NOHOMERETURN; }
 HaAcceptMobRtr   		{ return HAACCEPTMOBRTR; }
 IsMobRtr       			{ return ISMOBRTR; }
 HaServedPrefix       	       	{ return HASERVEDPREFIX; }

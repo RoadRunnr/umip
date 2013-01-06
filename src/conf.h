@@ -45,6 +45,7 @@ struct mip6_config {
 	char MnDiscardHaParamProb;
 	char SendMobPfxSols;
 	char OptimisticHandoff;
+	char NoHomeReturn;
 
 	/* HA options */
 	char HaAcceptMobRtr;

@@ -217,6 +217,7 @@ static void conf_default(struct mip6_config *c)
 	c->MobRtrUseExplicitMode = 1;
 	c->SendMobPfxSols = 1;
 	c->OptimisticHandoff = 0;
+	c->NoHomeReturn = 0;
 
 	/* HA options */
 	c->SendMobPfxAdvs = 1;

@@ -400,6 +400,35 @@ before using RO or reverse tunneling.
 Default: disabled;
 
 .TP
+.BR "NoHomeReturn " "enabled | disabled" ";"
+
+When a MN returns Home, it usually deregisters its binding. Additionally,
+when IPsec is in use to protect data traffic, a MN also deinstall the
+IPsec Security Policies protecting data traffic. One problem with that
+expected behavior is that an insecure trigger (Home Link Detection
+mechanism, based on prefix announced in RA messages) is used for the
+removal of IPsec Security Policies for data traffic.
+
+The \fBNoHomeReturn\fP option can be used to change that behavior. When
+enabled, the MN will never consider itself at home. That way, if IPsec
+is used to protect data traffic, associated Security Policies will
+never be removed.
+
+Note that for the option to work when the MN really returns home
+(i.e. on the subnet where the Home Agent is defending MN's HoA), the two
+following conditions must be met:
+
+1) The HoA of the MN must be different from the CoA the MN will 
+automatically configure itself on its interface that connects to its
+home network,
+
+2) The interface that connects to the home subnet must not be the 
+\fBMnHomeLink\fP interface (because the MN configures its HoA on that 
+interface, which will in turn make DAD fail on the HA for the HoA).
+
+Default: disabled;
+
+.TP
 .nf
 .BR "MnHomeLink " "name " "{"
 .BR "	HomeAddress " "address/length MNP list" ";"
