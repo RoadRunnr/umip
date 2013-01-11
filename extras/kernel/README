@@ -2,3 +2,5 @@ The kernel patches in this directory have been tested on
 3.7 kernels and above, and must be applied to get UMIP 
 working on such kernels. These patches will be removed as
 soon as their integration will be performed upstream. 
+
+They can be applied in any order.
