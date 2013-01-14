@@ -1045,6 +1045,8 @@ static int mn_chk_bauth(struct ip6_mh_binding_ack *ba, ssize_t len,
 	return -1;
 }
 
+static void mn_move_positive_non_home(void);
+
 static void mn_recv_ba(const struct ip6_mh *mh, ssize_t len,
 		       const struct in6_addr_bundle *in,
 		       __attribute__ ((unused)) int iif)
@@ -1200,8 +1202,8 @@ static void mn_recv_ba(const struct ip6_mh *mh, ssize_t len,
 			 */
 			bul_iterate(&hai->bul, _bul_flush, &type);
 			bul_iterate(&hai->bul, mn_rr_start_handoff, NULL);
+			mn_move_positive_non_home();
 			pthread_rwlock_unlock(&mn_lock);
-			mn_movement_event(NULL);
 			mn_block_rule_del(hai);
 			return;
 		}
@@ -2373,45 +2375,51 @@ static void mn_chk_ho_verdict(struct home_addr_info *hai,
 	}
 }
 
+/* Iterate on existing home address info structures, check verdict for each and
+ * then perform movement if verdict is positive. Just do nothing if at home or
+ * waiting for BA. Function must be called with rw lock acquired on mn_lock */
+static void mn_move_positive_non_home(void)
+{
+	struct list_head *lh;
+	struct home_addr_info *hai;
+
+	if (pending_bas)
+		return;
+
+	list_for_each(lh, &home_addr_list) {
+		hai = list_entry(lh, struct home_addr_info, list);
+		if (!hai->at_home && positive_ho_verdict(hai->verdict))
+			mn_move(hai);
+	}
+}
+
+/* Handle (non NULL) movement events */
 int mn_movement_event(struct movement_event *event)
 {
 	struct list_head *lh;
 	struct home_addr_info *hai;
 
-        /* First de-registration */
-
+	assert(event != NULL);
 	pthread_rwlock_wrlock(&mn_lock);
 
-	if (event != NULL) {
-		if (event->event_type == ME_DHAAD) {
-			hai = mn_get_home_addr_by_dhaadid(event->data);
-			if (hai == NULL) {
-				pthread_rwlock_unlock(&mn_lock);
-				return 0;
-			}
-			dhaad_stop(hai);
-			mn_chk_ho_verdict(hai, event);
-		} else {
-			if (event->event_type == ME_COA_EXPIRED)
-				mn_rr_delete_co(&event->coa->addr);
-			list_for_each(lh, &home_addr_list) {
-				hai = list_entry(lh, 
-						 struct home_addr_info, list);
-				mn_chk_ho_verdict(hai, event);
-			}
-		}
-	}
-	/* Then registration if we are not at home,
-	   otherwise we need to wait for BA to avoid forwarding loops */
-	if (!pending_bas) {
+	if (event->event_type == ME_DHAAD) {
+		hai = mn_get_home_addr_by_dhaadid(event->data);
+		if (hai == NULL)
+			goto out;
+		dhaad_stop(hai);
+		mn_chk_ho_verdict(hai, event);
+	} else {
+		if (event->event_type == ME_COA_EXPIRED)
+			mn_rr_delete_co(&event->coa->addr);
 		list_for_each(lh, &home_addr_list) {
 			hai = list_entry(lh, struct home_addr_info, list);
-			if (!hai->at_home && 
-			    positive_ho_verdict(hai->verdict)) {
-				mn_move(hai);
-			}
+			mn_chk_ho_verdict(hai, event);
 		}
 	}
+
+	mn_move_positive_non_home();
+
+ out:
 	pthread_rwlock_unlock(&mn_lock);
 	return 0;
 }
