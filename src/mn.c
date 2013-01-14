@@ -1284,7 +1284,7 @@ static void mn_recv_ba(const struct ip6_mh *mh, ssize_t len,
 	    return;
 
 	dbg("Got BA (status %d) from %x:%x:%x:%x:%x:%x:%x:%x to home address "
-	    "%x:%x:%x:%x:%x:%x:%x:%x with coa %x:%x:%x:%x:%x:%x:%x:%x. ",
+	    "%x:%x:%x:%x:%x:%x:%x:%x with coa %x:%x:%x:%x:%x:%x:%x:%x.\n",
 	    ba->ip6mhba_status, NIP6ADDR(in->src), NIP6ADDR(in->dst),
 	    NIP6ADDR(in->local_coa != NULL ? in->local_coa : &in6addr_any));
 
