@@ -132,6 +132,7 @@ enum {
 	ME_COA_EXPIRED,
 	ME_COA_LFT_DEC,
 	ME_COA_LFT_INC,
+	ME_INIT,
 };
 
 

@@ -370,6 +370,31 @@ Corresponent Nodes.
 Default: disabled
 
 .TP
+.BR "InterfaceInitialInitDelay " "decimal" ";"
+
+Defines the delay in seconds for initial interface configuration at
+startup before any movement decision occurs.
+
+At startup, UMIP gathers information on interfaces available on the system.
+Then, for interfaces listed in the configuration, it either learn CoA
+(for those marked as \fBTunnel\fP) or send RS to receive RA (asynchronously)
+and then configured CoA.
+
+At startup, if the MN has multiple interfaces, UMIP may first select a
+CoA on a given interface and then change its mind and switch to
+another CoA. This may result in the emission of multiple useless
+BU. Additionally, when Dynamic Keying (IKE) is used for negotiating
+protection of traffic, a CoA change occurring during the initial
+negotiation only leads to additional delays.
+
+By introducing an initial default delay at startup, that side effect
+is avoided. If your MN is configured to use only a single interface,
+or do not use IKE and startup delay matters, you may set the parameter
+to 0.
+
+Default: 2.0
+
+.TP
 .BR "MnRouterProbes " "number" ";"
 
 Indicates how many times the MN should send Neighbor Unreachability

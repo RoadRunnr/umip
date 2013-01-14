@@ -2342,6 +2342,8 @@ static int mn_make_ho_verdict(const struct movement_event *me,
 
 		*next_coa = me->coa;
 		return MN_HO_CHECK_LIFETIME;
+	case ME_INIT:
+		break;
 	default:
 		return MN_HO_IGNORE;
 	}

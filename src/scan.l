@@ -239,6 +239,7 @@ HomeAgentAddress		{ return HOMEAGENTADDRESS; }
 InitialBindackTimeoutFirstReg	{ return INITIALBINDACKTIMEOUTFIRSTREG; }
 InitialBindackTimeoutReReg	{ return INITIALBINDACKTIMEOUTREREG; }
 InitialSolicitTimer		{ return INITIALSOLICITTIMER; }
+InterfaceInitialInitDelay	{ return INTERFACEINITIALINITDELAY; }
 LinkName			{ return LINKNAME; }
 HaMaxBindingLife		{ return HAMAXBINDINGLIFE; }
 MnMaxHaBindingLife		{ return MNMAXHABINDINGLIFE; }
