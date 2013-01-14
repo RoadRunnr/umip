@@ -335,6 +335,8 @@ Default: disabled
 Controls whether mobile node sends Mobile Prefix Solicitations to the
 home network.
 
+Default: enabled
+
 .TP
 .BR "DoRouteOptimizationMN " "boolean" ";"
 
@@ -372,7 +374,7 @@ Default: disabled
 .TP
 .BR "InterfaceInitialInitDelay " "decimal" ";"
 
-Defines the delay in seconds for initial interface configuration at
+Defines the delay (in seconds) for initial interface configuration at
 startup before any movement decision occurs.
 
 At startup, UMIP gathers information on interfaces available on the system.
@@ -417,7 +419,7 @@ Retransmit Timer is 1 second, but MnRouterProbeTimeout is just 0.2
 seconds, the MN will only wait 0.2 seconds for a Neighbor Advertisement
 before proceeding with the handoff.
 
-Default: 0
+Default: 0.0
 
 .TP
 .BR "InitialBindackTimeoutFirstReg " "decimal" ";"
@@ -437,7 +439,7 @@ the Binding Update when no Binding Ack has been received. For the
 first registration attempt, you may set the 
 \fBInitialBindackTimeoutFirstReg\fP option.
 
-Default: 1
+Default: 1.0
 
 .TP
 .BR "InitialSolicitTimer " "decimal" ";"
@@ -446,7 +448,7 @@ Indicates how long (in seconds) the MN should wait before sending the
 initial Mobile Prefix Solitication message. Option \fBSendMobPfxSols\fP 
 must be enabled. 
 
-Default: 3
+Default: 3.0
 
 .TP
 .BR "OptimisticHandoff " "enabled | disabled" ";"
