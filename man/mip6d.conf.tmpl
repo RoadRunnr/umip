@@ -241,11 +241,15 @@ Default: 262140
 Controls whether home agent sends Mobile Prefix Advertisements to
 mobile nodes in foreign networks.
 
+Default: enabled
+
 .TP
 .BR "SendUnsolMobPfxAdvs " "boolean" ";"
 
 Controls whether home agent send unsolicited Mobile Prefix
 Advertisements to mobile nodes in foreign networks.
+
+Default: enabled
 
 .TP
 .BR "MinMobPfxAdvInterval " "number" ";"
@@ -266,7 +270,7 @@ Default: 86400
 
 Indicates if the HA accepts Mobile Router bindings.
 
-Default: disabled;
+Default: disabled
 
 .TP
 .BR "HaServedPrefix " "prefix/length" ";"
@@ -391,6 +395,26 @@ before proceeding with the handoff.
 Default: 0
 
 .TP
+.BR "InitialBindackTimeoutFirstReg " "decimal" ";"
+
+Upon the first registration attempt, indicates how long (in seconds) 
+the MN should wait before re-sending the Binding Update when no 
+Binding Ack has been received. For subsequent registrations, you may 
+set the \fBInitialBindackTimeoutReReg\fP option. 
+
+Default: 1.5
+
+.TP
+.BR "InitialBindackTimeoutReReg " "decimal" ";"
+
+Indicates how long (in seconds) the MN should wait before re-sending 
+the Binding Update when no Binding Ack has been received. For the 
+first registration attempt, you may set the 
+\fBInitialBindackTimeoutFirstReg\fP option.
+
+Default: 1
+
+.TP
 .BR "InitialSolicitTimer " "decimal" ";"
 
 Indicates how long (in seconds) the MN should wait before sending the 
@@ -409,7 +433,7 @@ Mobile Node to assume that the binding was successful right after the
 BU has been sent, and does not wait for a positive acknowledgement
 before using RO or reverse tunneling.
 
-Default: disabled;
+Default: disabled
 
 .TP
 .BR "NoHomeReturn " "enabled | disabled" ";"
@@ -438,7 +462,7 @@ home network,
 \fBMnHomeLink\fP interface (because the MN configures its HoA on that 
 interface, which will in turn make DAD fail on the HA for the HoA).
 
-Default: disabled;
+Default: disabled
 
 .TP
 .nf
