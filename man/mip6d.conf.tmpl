@@ -49,7 +49,10 @@ Default: 0
 .BR "DoRouteOptimizationCN " "boolean" ";"
 
 Indicates if a node should participate in route optimization with a
-Mobile Node.
+Mobile Node, i.e. if it should accept a binding proposed by a peer.
+The value is global and applies to all received binding. There is at
+the moment no option available to define more specific policies based
+on proposed binding.
 
 Default: enabled
 
