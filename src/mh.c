@@ -59,7 +59,7 @@
 #if MH_DEBUG_LEVEL >= 1
 #define MDBG dbg
 #else
-#define MDBG(x...)
+#define MDBG(...)
 #endif
 
 struct sock {
@@ -1102,7 +1102,7 @@ void mh_ba_status_to_str(int status, char *err_str)
 
 	switch (status) {
 	case IP6_MH_BAS_ACCEPTED:            s = "Binding Update accepted"; break;
-	case IP6_MH_BAS_PRFX_DISCOV:         s = "Accepted but prefix discovery necessary" ; break;
+	case IP6_MH_BAS_PRFX_DISCOV:         s = "Accepted but prefix discovery necessary"; break;
 	case IP6_MH_BAS_UNSPECIFIED:         s = "Reason unspecified"; break;
 	case IP6_MH_BAS_PROHIBIT:            s = "Administratively prohibited"; break;
 	case IP6_MH_BAS_INSUFFICIENT:        s = "Insufficient resources"; break;

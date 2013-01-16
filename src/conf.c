@@ -273,74 +273,102 @@ void conf_show(struct mip6_config *c)
 	struct list_head *list;
 
 	/* Common options */
-	dbg("config_file = %s\n", c->config_file);
+	dbg("Configuration file = %s\n", c->config_file);
 #ifdef ENABLE_VT
-	dbg("vt_hostname = %s\n", c->vt_hostname);
-	dbg("vt_service = %s\n", c->vt_service);
+	dbg("VT hostname = %s\n", c->vt_hostname);
+	dbg("VT service = %s\n", c->vt_service);
 #endif
-	dbg("mip6_entity = %u\n", c->mip6_entity);
-	dbg("debug_level = %u\n", c->debug_level);
-	dbg("debug_log_file = %s\n", (c->debug_log_file ? c->debug_log_file :
-				      "stderr"));
-	if (c->pmgr.so_path)
-		dbg("PolicyModulePath = %s\n", c->pmgr.so_path);
-	dbg("DefaultBindingAclPolicy = %s\n",
-			(c->DefaultBindingAclPolicy  == IP6_MH_BAS_ACCEPTED) ? "allow":"deny");
-	list_for_each(list, &c->bind_acl) {
-		struct policy_bind_acl_entry *acl;
-		acl = list_entry(list, struct policy_bind_acl_entry, list);
-		dbg("- HoA %x:%x:%x:%x:%x:%x:%x:%x (%d MNP): %s\n",
-			NIP6ADDR(&acl->hoa),
-			acl->mnp_count,
-			(acl->bind_policy == IP6_MH_BAS_ACCEPTED) ? "allow":"deny");
-	}
-
+	dbg("NodeConfig = %u\n", c->mip6_entity);
+	dbg("DebugLevel = %u\n", c->debug_level);
+	dbg("DebugLogFile = %s\n",
+	    (c->debug_log_file ? c->debug_log_file : "stderr"));
+	dbg("DoRouteOptimizationCN = %s\n",
+	    CONF_BOOL_STR(c->DoRouteOptimizationCN));
 	dbg("NonVolatileBindingCache = %s\n",
 	    CONF_BOOL_STR(c->NonVolatileBindingCache));
+	if (c->pmgr.so_path)
+		dbg("PolicyModulePath = %s\n", c->pmgr.so_path);
 	
 	/* IPsec options */
 	dbg("KeyMngMobCapability = %s\n",
 	    CONF_BOOL_STR(c->KeyMngMobCapability));
 	dbg("UseMnHaIPsec = %s\n", CONF_BOOL_STR(c->UseMnHaIPsec));
 
-	/* MN options */
-	dbg("MnMaxHaBindingLife = %u\n", c->MnMaxHaBindingLife);
-	dbg("MnMaxCnBindingLife = %u\n", c->MnMaxCnBindingLife);
-	dbg("MnRouterProbes = %u\n", c->MnRouterProbes);
-	dbg("MnRouterProbeTimeout = %f\n",
-	    tstodsec(c->MnRouterProbeTimeout_ts));
-	dbg("InitialBindackTimeoutFirstReg = %f\n", 
-	    tstodsec(c->InitialBindackTimeoutFirstReg_ts));
-	dbg("InitialBindackTimeoutReReg = %f\n", 
-	    tstodsec(c->InitialBindackTimeoutReReg_ts));
-	dbg("InitialSolicitTimer = %f\n", tstodsec(c->InitialSolicitTimer_ts));
-	dbg("InterfaceInitialInitDelay = %f\n",
-	    tstodsec(c->InterfaceInitialInitDelay_ts));
-	if (c->MoveModulePath)
-		dbg("MoveModulePath = %s\n", c->MoveModulePath);
-	dbg("UseCnBuAck = %s\n", CONF_BOOL_STR(c->CnBuAck));
-	dbg("DoRouteOptimizationMN = %s\n",
-	    CONF_BOOL_STR(c->DoRouteOptimizationMN));
-	dbg("MnUseAllInterfaces = %s\n", CONF_BOOL_STR(c->MnUseAllInterfaces));
-	dbg("MnDiscardHaParamProb = %s\n",
-	    CONF_BOOL_STR(c->MnDiscardHaParamProb));
-	dbg("SendMobPfxSols = %s\n", CONF_BOOL_STR(c->SendMobPfxSols));
-	dbg("OptimisticHandoff = %s\n", CONF_BOOL_STR(c->OptimisticHandoff));
-	dbg("MobRtrUseExplicitMode = %s\n",
-	    CONF_BOOL_STR(c->MobRtrUseExplicitMode));
+	switch (c->mip6_entity) {
+		case MIP6_ENTITY_MN:
+		/* MN options */
+		dbg("MnMaxHaBindingLife = %u\n", c->MnMaxHaBindingLife);
+		dbg("MnMaxCnBindingLife = %u\n", c->MnMaxCnBindingLife);
+		dbg("MnDiscardHaParamProb = %s\n",
+		    CONF_BOOL_STR(c->MnDiscardHaParamProb));
+		dbg("SendMobPfxSols = %s\n",
+		    CONF_BOOL_STR(c->SendMobPfxSols));
+		dbg("DoRouteOptimizationMN = %s\n",
+		    CONF_BOOL_STR(c->DoRouteOptimizationMN));
+		dbg("MnUseAllInterfaces = %s\n",
+		    CONF_BOOL_STR(c->MnUseAllInterfaces));
+		dbg("UseCnBuAck = %s\n", CONF_BOOL_STR(c->CnBuAck));
+		dbg("InterfaceInitialInitDelay = %f\n",
+		    tstodsec(c->InterfaceInitialInitDelay_ts));
+		dbg("MnRouterProbes = %u\n", c->MnRouterProbes);
+		dbg("MnRouterProbeTimeout = %f\n",
+		    tstodsec(c->MnRouterProbeTimeout_ts));
+		dbg("InitialBindackTimeoutFirstReg = %f\n", 
+		    tstodsec(c->InitialBindackTimeoutFirstReg_ts));
+		dbg("InitialBindackTimeoutReReg = %f\n", 
+		    tstodsec(c->InitialBindackTimeoutReReg_ts));
+		dbg("InitialSolicitTimer = %f\n",
+		    tstodsec(c->InitialSolicitTimer_ts));
+		dbg("OptimisticHandoff = %s\n",
+		    CONF_BOOL_STR(c->OptimisticHandoff));
+		dbg("MobRtrUseExplicitMode = %s\n",
+		    CONF_BOOL_STR(c->MobRtrUseExplicitMode));
+		dbg("NoHomeReturn = %s\n", CONF_BOOL_STR(c->NoHomeReturn));
+		if (c->MoveModulePath)
+			dbg("MoveModulePath = %s\n", c->MoveModulePath);
+		break;
 
-	/* HA options */
-	dbg("SendMobPfxAdvs = %s\n", CONF_BOOL_STR(c->SendMobPfxAdvs));
-	dbg("SendUnsolMobPfxAdvs = %s\n",
-	    CONF_BOOL_STR(c->SendUnsolMobPfxAdvs));
-	dbg("MaxMobPfxAdvInterval = %u\n", c->MaxMobPfxAdvInterval);
-	dbg("MinMobPfxAdvInterval = %u\n", c->MinMobPfxAdvInterval);
-	dbg("HaMaxBindingLife = %u\n", c->HaMaxBindingLife);
-	dbg("HaAcceptMobRtr = %s\n", CONF_BOOL_STR(c->HaAcceptMobRtr));
+		case MIP6_ENTITY_HA:
+		/* HA options */
+		dbg("HaMaxBindingLife = %u\n", c->HaMaxBindingLife);
+		dbg("SendMobPfxAdvs = %s\n", CONF_BOOL_STR(c->SendMobPfxAdvs));
+		dbg("SendUnsolMobPfxAdvs = %s\n",
+		    CONF_BOOL_STR(c->SendUnsolMobPfxAdvs));
+		dbg("MinMobPfxAdvInterval = %u\n", c->MinMobPfxAdvInterval);
+		dbg("MaxMobPfxAdvInterval = %u\n", c->MaxMobPfxAdvInterval);
+		dbg("HaAcceptMobRtr = %s\n", CONF_BOOL_STR(c->HaAcceptMobRtr));
+		if (list_empty(&c->nemo_ha_served_prefixes)) {
+			dbg("HaServedPrefix = no prefixes\n");
+		} else {
+			dbg("HaServedPrefix =\n");
+			list_for_each(list, &c->nemo_ha_served_prefixes) {
+				struct prefix_list_entry *pfx;
+				pfx = list_entry(list, struct prefix_list_entry, list);
+				dbg("- %x:%x:%x:%x:%x:%x:%x:%x/%d\n",
+				    NIP6ADDR(&pfx->ple_prefix), pfx->ple_plen);
+			}
+		}
+		dbg("DefaultBindingAclPolicy = %s\n",
+		    (c->DefaultBindingAclPolicy  == IP6_MH_BAS_ACCEPTED) ?
+		     "allow":"deny");
+		list_for_each(list, &c->bind_acl) {
+			struct policy_bind_acl_entry *acl;
+			acl = list_entry(list, struct policy_bind_acl_entry, list);
+			dbg("- HoA %x:%x:%x:%x:%x:%x:%x:%x (%d MNP): %s\n",
+			    NIP6ADDR(&acl->hoa), acl->mnp_count,
+			    (acl->bind_policy == IP6_MH_BAS_ACCEPTED) ?
+			    "allow":"deny");
+		}
+		break;
 
-	/* CN options */
-	dbg("DoRouteOptimizationCN = %s\n",
-	    CONF_BOOL_STR(c->DoRouteOptimizationCN));
+		case MIP6_ENTITY_CN:
+		/* CN options: no specific options (DoRouteOptimizationCN 
+		 * is shared by all nodes) */
+		break;
+
+		default:
+		break;
+	}
 }
 
 void conf_free(struct mip6_config *c)
