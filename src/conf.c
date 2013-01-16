@@ -375,12 +375,20 @@ void conf_free(struct mip6_config *c)
 {
 	struct list_head *h, *nh;
 	struct home_addr_info *hai;
+	struct net_iface *iface;
 
 	if (c->config_file) {
 		free(c->config_file);
 	}
 
 	pmgr_close(&c->pmgr);
+
+	/* Cleanup the net_ifaces list */
+	list_for_each_safe(h, nh, &c->net_ifaces) {
+		iface = list_entry(h, struct net_iface, list);
+		list_del(h);
+		free(iface);
+	}
 
 	/* For each home_addr_info, we have to remove the 
 	 * intern lists mob_net_prefix and ro_policy */
