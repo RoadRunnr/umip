@@ -2,10 +2,10 @@ dnl $Id: configure.ac 1.45 06/05/07 17:37:11+03:00 anttit@tcs.hut.fi $
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.57)
-AC_INIT([MIPL Mobile IPv6 for Linux], [2.0.2-umip-0.4],
-	[URL:http://www.mobile-ipv6.org/bugs/], mipv6)
+AC_INIT([UMIP Mobile IPv6 for Linux], [umip-0.5],
+	[URL:http://umip.org/], umip)
 AC_DEFINE_UNQUOTED([PACKAGE_COPYRIGHT],
-	["Copyright (C) 2003-2006 Helsinki University of Technology, and others"], 
+	["Copyright (C) 2003-2013 Helsinki University of Technology, and others"], 
 	[Define to the copyright statement])
 
 AC_CONFIG_SRCDIR([src/main.c])
