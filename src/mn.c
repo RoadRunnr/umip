@@ -1071,12 +1071,11 @@ static void mn_process_ha_ba(struct ip6_mh_binding_ack *ba,
 	bule->consecutive_resends = 0;
 	clock_gettime(CLOCK_REALTIME, &now);
 	if (ba->ip6mhba_status >= IP6_MH_BAS_UNSPECIFIED) {
-		char err_str[MAX_BA_STATUS_STR_LEN];
-
 		if (ba->ip6mhba_status == IP6_MH_BAS_SEQNO_BAD) {
-			mh_ba_status_to_str(ba->ip6mhba_status, err_str);
-			syslog(LOG_ERR, "Received BA with error status %s. "
-			       "Resending BU w/ updated seqno\n", err_str);
+			syslog(LOG_ERR, "Received BA with error status %s (%d). "
+			       "Resending BU w/ updated seqno\n",
+			       mh_ba_status_to_str(ba->ip6mhba_status),
+			       ba->ip6mhba_status);
 			clock_gettime(CLOCK_REALTIME, &bule->lastsent);
 			bule->seq = seqno + 1;
 			mn_get_home_lifetime(bule->home, &bule->lifetime, 0);
@@ -1099,9 +1098,10 @@ static void mn_process_ha_ba(struct ip6_mh_binding_ack *ba,
 			return;
 		}
 
-		mh_ba_status_to_str(ba->ip6mhba_status, err_str);
-		syslog(LOG_ERR, "Received BA with error status %s. Unable "
-		       "to register with HA. Deleting entry\n", err_str);
+		syslog(LOG_ERR, "Received BA with error status %s (%d). Unable "
+		       "to register with HA. Deleting entry\n",
+		       mh_ba_status_to_str(ba->ip6mhba_status),
+		       ba->ip6mhba_status);
 
 		if (hai->use_dhaad) {
 			bule_invalidate(bule, &now, 0);
