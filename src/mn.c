@@ -1590,6 +1590,7 @@ static int conf_home_addr_info(struct home_addr_info *conf_hai)
 	}
 	if (IN6_IS_ADDR_UNSPECIFIED(&hai->ha_addr)) {
 		hai->use_dhaad = 1;
+		MDBG("HA address unknown, using DHAAD\n");
 	} else {
 		MDBG("HA address %x:%x:%x:%x:%x:%x:%x:%x\n", 
 		     NIP6ADDR(&hai->ha_addr)); 
