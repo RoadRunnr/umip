@@ -1605,7 +1605,7 @@ static int vt_server_clean(const struct sockaddr *sa, int salen)
 
 static void vt_server_close(struct vt_server_entry *e)
 {
-	if (e->vse_sock) {
+	if (e->vse_sock >= 0) {
 		close(e->vse_sock);
 		e->vse_sock = -1;
 	}
