@@ -14,6 +14,9 @@ enclosed in '{' and '}'.  Optional parameters are designated with square
 brackets (you must omit them if you set the optional parameter).  Strings
 are quoted with double quotes.
 
+Default value is given when available. Support for dynamic reload
+of the option through SIGHUP is also indicated.
+
 .SH COMMON OPTIONS
 
 The file contains the following common definitions:
@@ -38,6 +41,8 @@ Mobile Node mode.
 
 Default: CN
 
+Dynamic reload: not supported. Daemon must be restarted.
+
 .TP
 .BR "DebugLevel "  number ";"
 
@@ -47,12 +52,16 @@ printed on the controlling tty).
 
 Default: 0
 
+Dynamic reload: partially supported. Cannot detach from tty afterwards.
+
 .TP
 .BR "DebugLogFile " """/path/to/log/file""" ";"
 
 Indicates where debug logs should be stored.
 
 Default: empty (output is redirected to stderr)
+
+Dynamic reload: not supported. Daemon must be restarted.
 
 .TP
 .BR "DoRouteOptimizationCN " "boolean" ";"
@@ -64,6 +73,8 @@ The value is used as the default binding policy value, if no
 have been defined for the proposed binding. 
 
 Default: enabled
+
+Dynamic reload: supported but does not affect existing bindings.
 
 .TP
 .nf
@@ -101,7 +112,7 @@ Default: by default, the set is empty and the default value provided by
 .B DoRouteOptimizationCN
 configuration parameter applies for all peers.
 
-Change on reloading: not supported.
+Dynamic reload: not supported.
 
 .TP
 .BR "NonVolatileBindingCache " "boolean" ";"
@@ -136,6 +147,9 @@ used by multihomed Mobile Nodes to define which interfaces are used by
 it. For MN and CN, it is posible to provide interfaces that are not
 already available when the daemon is started. Those will be used when
 available.
+
+Dynamic reload: partially supported. Only new inet6 interfaces will
+use the new configuration.
 
 .B MnIfPreference
 sets the interface preference value for an interface in a multi-homed
@@ -219,6 +233,8 @@ Indicates if the MN-HA MIPv6 signalling should be protected with IPsec.
 
 Default: enabled
 
+Dynamic reload: not supported.
+
 .TP
 .BR "KeyMngMobCapability " "boolean" ";"
 
@@ -227,6 +243,8 @@ enabled.  It turns on the K-bit for binding updates and binding
 acknowledgements.
 
 Default: disabled
+
+Dynamic reload: supported.
 
 .TP
 .nf
@@ -247,6 +265,9 @@ options, but only one
 option.  For home agent, home agent address field contains its own
 address, and home address fields may contain any number of mobile
 nodes for which the same policy applies.
+
+Dynamic reload: supported. The sets can be changed, added or removed.
+Removing rules for established bindings may have unpredicted effects.
 
 .B IPsecPolicy
 has the following format:
@@ -282,6 +303,8 @@ Limits the maximum lifetime (in seconds) for Mobile Node home registrations.
 
 Default: 262140
 
+Dynamic reload: partially supported. Only affects new bindings.
+
 .TP
 .BR "SendMobPfxAdvs " "boolean" ";"
 
@@ -289,6 +312,8 @@ Controls whether home agent sends Mobile Prefix Advertisements to
 mobile nodes in foreign networks.
 
 Default: enabled
+
+Dynamic reload: partially supported. Only affects new bindings.
 
 .TP
 .BR "SendUnsolMobPfxAdvs " "boolean" ";"
@@ -298,12 +323,16 @@ Advertisements to mobile nodes in foreign networks.
 
 Default: enabled
 
+Dynamic reload: partially supported. Only affects new bindings.
+
 .TP
 .BR "MinMobPfxAdvInterval " "number" ";"
 
 Sets a minimum interval (in seconds) for Mobile Prefix Advertisements.
 
 Default: 600
+
+Dynamic reload: partially supported. Only affects new scheduled MPA.
 
 .TP
 .BR "MaxMobPfxAdvInterval " "number" ";"
@@ -312,12 +341,16 @@ Sets a maximum interval (in seconds) for Mobile Prefix Advertisements.
 
 Default: 86400
 
+Dynamic reload: Partially supported. Only affects new scheduled MPA.
+
 .TP
 .BR "HaAcceptMobRtr " "enabled | disabled" ";"
 
 Indicates if the HA accepts Mobile Router bindings.
 
 Default: disabled
+
+Dynamic reload: supported.
 
 .TP
 .BR "HaServedPrefix " "prefix/length" ";"
@@ -326,6 +359,8 @@ Prefix is an IPv6 prefix and length is the prefix length. Defines the whole
 aggregated or extended prefix the HA serves. This option is only used for MR
 bindings and is only needed if the MRs derive their Home Addresses from their
 Mobile Network Prefixes, instead of one of the home link prefixes.
+
+Dynamic reload: supported.
 
 .TP
 .BR "BindingAclPolicy " "address " "[ MNP-list ] " "allow | deny" ";"
@@ -338,6 +373,9 @@ belonging a NEMO Mobile Router are optionally listed in
 for example:
 .B "(3ffe:2620:6:3::/64, 3ffe:2620:6:4::/64)"
 
+Dynamic reload: partially supported. Does not affect existing bindings
+until they expire.
+
 .TP
 .BR "DefaultBindingAclPolicy " "allow | deny" ";"
 
@@ -345,6 +383,8 @@ Defines the default policy if no matching BindingAclPolicy entry is found for
 a MN.
 
 Default: allow
+
+Dynamic reload: partially supported. Only affects new bindings.
 
 .SH MOBILE NODE SPECIFIC OPTIONS
 
@@ -357,6 +397,8 @@ Limits the maximum lifetime (in seconds) for Mobile Node home registrations.
 
 Default: 262140
 
+Dynamic reload: partially supported. Only affects new bindings.
+
 .TP
 .BR "MnMaxCnBindingLife " "number" ";"
 
@@ -364,6 +406,8 @@ Limits the maximum lifetime (in seconds) for Mobile Node Correspondent
 Node registrations.
 
 Default: 420
+
+Dynamic reload: partially supported. Only affects new bindings.
 
 .TP
 .BR "MnDiscardHaParamProb " "boolean" ";"
@@ -377,6 +421,8 @@ by IPsec.
 
 Default: disabled
 
+Dynamic reload: supported.
+
 .TP
 .BR "SendMobPfxSols " "boolean" ";"
 
@@ -385,6 +431,8 @@ home network.
 
 Default: enabled
 
+Dynamic reload: supported.
+
 .TP
 .BR "DoRouteOptimizationMN " "boolean" ";"
 
@@ -392,6 +440,8 @@ Indicates if the Mobile Node should initialize route optimization with
 Correspondent Nodes.
 
 Default: enabled
+
+Dynamic reload: partially supported, disabling is not supported.
 
 .TP
 .BR "MnUseAllInterfaces " "enabled | disabled" ";"
@@ -404,12 +454,16 @@ options to explicitly list the used interfaces.
 
 Default: disabled
 
+Dynamic reload: same support as "Interface" directive.
+
 .TP
 .BR "MobRtrUseExplicitMode " "enabled | disabled" ";"
 
 Toggles between explicit or implicit mode home registrations in the MR.
 
 Default: enabled
+
+Dynamic reload: supported.
 
 .TP
 .BR "UseCnBuAck " "boolean" ";"
@@ -418,6 +472,8 @@ Indicates if the Acknowledge bit should be set in Binding Updates sent to
 Correspondent Nodes.
 
 Default: disabled
+
+Dynamic reload: supported.
 
 .TP
 .BR "InterfaceInitialInitDelay " "decimal" ";"
@@ -444,6 +500,8 @@ to 0.
 
 Default: 2.0
 
+Dynamic reload: not supported (only valid at daemon startup).
+
 .TP
 .BR "MnRouterProbes " "number" ";"
 
@@ -455,6 +513,8 @@ than the old one (as defined in RFC 4191), the MN will move to the new
 router straight away.
 
 Default: 0
+
+Dynamic reload: supported.
 
 .TP
 .BR "MnRouterProbeTimeout " "decimal" ";"
@@ -469,6 +529,8 @@ before proceeding with the handoff.
 
 Default: 0.0
 
+Dynamic reload: supported.
+
 .TP
 .BR "InitialBindackTimeoutFirstReg " "decimal" ";"
 
@@ -478,6 +540,8 @@ Binding Ack has been received. For subsequent registrations, you may
 set the \fBInitialBindackTimeoutReReg\fP option. 
 
 Default: 1.5
+
+Dynamic reload: partially supported. Only affects new bindings.
 
 .TP
 .BR "InitialBindackTimeoutReReg " "decimal" ";"
@@ -489,6 +553,9 @@ first registration attempt, you may set the
 
 Default: 1.0
 
+Dynamic reload: partially supported. Does not affect existing bindings
+until they expire.
+
 .TP
 .BR "InitialSolicitTimer " "decimal" ";"
 
@@ -497,6 +564,8 @@ initial Mobile Prefix Solitication message when no answers have been
 received. Option \fBSendMobPfxSols\fP must be enabled. 
 
 Default: 3.0
+
+Dynamic reload: not supported.
 
 .TP
 .BR "OptimisticHandoff " "enabled | disabled" ";"
@@ -509,6 +578,8 @@ BU has been sent, and does not wait for a positive acknowledgement
 before using RO or reverse tunneling.
 
 Default: disabled
+
+Dynamic reload: supported.
 
 .TP
 .BR "NoHomeReturn " "enabled | disabled" ";"
@@ -539,6 +610,8 @@ interface, which will in turn make DAD fail on the HA for the HoA).
 
 Default: disabled
 
+Dynamic reload: supported (for the next home return).
+
 .TP
 .nf
 .BR "MnHomeLink " "name " "{"
@@ -557,7 +630,12 @@ set up multiple Home Addresses on the Mobile Node, you need to define
 multiple
 .B MnHomeLink
 structures.  The interface names don't have to be unique in these
-definitions.  All the home link specific definitions are detailed below: 
+definitions.
+
+Dynamic reload: not supported. The daemon has to be restarted for the
+changes in this directive to take effect.
+
+All the home link specific definitions are detailed below:
 
 .TP
 .BR "HomeAddress " "address/length " "[ MNP-list ]" ";"

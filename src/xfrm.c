@@ -607,7 +607,7 @@ static void create_ipsec_tmpl(struct xfrm_user_tmpl *tmpl, uint8_t proto,
 	}
 }
 
-static int _mn_ha_ipsec_init(const struct in6_addr *haaddr,
+int _mn_ha_ipsec_init(const struct in6_addr *haaddr,
 			     const struct in6_addr *hoa,
 			     struct ipsec_policy_entry *e,
 			     __attribute__ ((unused)) void *arg)
@@ -713,7 +713,7 @@ static int mr_ipsec_bypass_init(void)
 	int err=0;
 
 	/* Loop for each HomeAddress info */
-	list_for_each(home, &conf.home_addrs) {
+	list_for_each(home, &conf_parsed->home_addrs) {
 		struct home_addr_info *hai;
 		hai = list_entry(home, struct home_addr_info, list);
 
@@ -799,10 +799,10 @@ static int xfrm_mn_init(void)
 			      XFRM_STATE_WILDRECV);
 }
 
-static int _mn_ha_ipsec_cleanup(const struct in6_addr *haaddr,
-				const struct in6_addr *hoa,
-				struct ipsec_policy_entry *e,
-				__attribute__ ((unused)) void *arg)
+int _mn_ha_ipsec_cleanup(const struct in6_addr *haaddr,
+			 const struct in6_addr *hoa,
+			 struct ipsec_policy_entry *e,
+			 __attribute__ ((unused)) void *arg)
 {
 	struct xfrm_selector sel;
 	int ulp = 0;
@@ -872,7 +872,7 @@ static int mr_ipsec_bypass_cleanup(void)
 	int err=0;
 
 	/* Loop for each HomeAddress info */
-	list_for_each(home, &conf.home_addrs)
+	list_for_each(home, &conf_parsed->home_addrs)
 	{
 		struct home_addr_info *hai;
 		hai = list_entry(home, struct home_addr_info, list);
@@ -935,7 +935,7 @@ static void xfrm_mn_cleanup(void)
 
 }
 
-static int _ha_mn_ipsec_init(const struct in6_addr *haaddr,
+int _ha_mn_ipsec_init(const struct in6_addr *haaddr,
 			     const struct in6_addr *hoa,
 			     struct ipsec_policy_entry *e,
 			     __attribute__ ((unused)) void *arg)
@@ -1031,7 +1031,7 @@ static int xfrm_ha_init(void)
 	return 0;
 }
 
-static int _ha_mn_ipsec_cleanup(const struct in6_addr *haaddr,
+int _ha_mn_ipsec_cleanup(const struct in6_addr *haaddr,
 				const struct in6_addr *hoa,
 				struct ipsec_policy_entry *e,
 				__attribute__ ((unused)) void *arg)

@@ -48,6 +48,7 @@
 #include "mipv6.h"
 #include "mn.h"
 #include "cn.h"
+#include "xfrm.h"
 #include "prefix.h"
 #include "ipsec.h"
 #ifdef ENABLE_VT
@@ -432,3 +433,47 @@ void conf_free(struct mip6_config *c)
 		free (c->MoveModulePath);
 }
 
+int conf_update(struct mip6_config *c,
+		void (*apply_changes_cb)(struct mip6_config *,
+					 struct mip6_config *))
+{
+	/* c is a pointer to the current config.
+	 * We want to update some data from c according
+	 * to the changed configuration file. */
+	struct mip6_config *conf_new = NULL;
+	int ret = 0;
+
+	conf_new = malloc(sizeof(*conf_new));
+	if (!conf_new) {
+		perror("conf_update");
+		return -1;
+	}
+
+	conf_default(conf_new);
+
+	/* gram.y stores configuration items in conf_parsed,
+	 * so point it to conf_new */
+	conf_parsed = conf_new;
+
+	if ((ret = conf_file(conf_new, c->config_file)) < 0) {
+		dbg("Error in the new configuration file, "
+		    "changes not applied\n");
+	}
+
+	/* Make conf_parsed point back to the original config */
+	conf_parsed = c;
+
+	/* We now have the new config in conf_new, we can compute
+	 * the differences that we are interrested in */
+	if (!ret) {
+		apply_changes_cb(c, conf_new);
+	}
+
+	/* Free the memory allocated during the process.
+	 * conf_free() does not free conf_new so we free it 
+	 * by ourselves */
+	conf_free(conf_new);
+	free(conf_new);
+
+	return ret;
+}

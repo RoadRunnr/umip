@@ -68,15 +68,20 @@ static void sig_child(__attribute__ ((unused)) int unused)
 	while ((pid = waitpid(0, &status, WNOHANG)) > 0);
 }
 
+extern void conf_apply_changes(struct mip6_config *cur,
+			       struct mip6_config *new);
+
 static void reinit(void)
 {
 	/* got SIGHUP, reread configuration and reinitialize */
 	dbg("got SIGHUP, reinitilize\n");
+	(void)conf_update(&conf, &conf_apply_changes);
 	return;
 }
 
 
 struct mip6_config conf;
+struct mip6_config *conf_parsed = NULL;
 struct mip6_stat mipl_stat;
 
 static void terminate(void)
@@ -180,6 +185,10 @@ int main(int argc, char **argv)
 	sigset_t sigblock;
 	int logflags = 0;
 	int ret = 1;
+
+	/* gram.y stores configuration items in
+	 * conf_parsed, so point it to conf */
+	conf_parsed = &conf;
 
 	debug_init();
 
