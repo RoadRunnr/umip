@@ -472,6 +472,7 @@ static int ndisc_send_unspec(int oif, const struct in6_addr *dest,
 	iov.iov_len = sizeof(frame.ip) + datalen;
 
 	dst.sin6_family = AF_INET6;
+	memset(&msgh, 0, sizeof(msgh));
 	msgh.msg_name = &dst;
 	msgh.msg_namelen = sizeof(dst);
 	msgh.msg_iov = &iov;

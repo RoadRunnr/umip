@@ -322,6 +322,8 @@ int icmp6_send(int oif, uint8_t hoplimit,
 		dbg("out of memory\n");
 		return -ENOMEM;
 	}
+	memset(cmsg, 0, cmsglen);
+	memset(&msg, 0, sizeof(msg));
 	cmsg->cmsg_len = CMSG_LEN(sizeof(pinfo));
 	cmsg->cmsg_level = IPPROTO_IPV6;
 	cmsg->cmsg_type = IPV6_PKTINFO;
