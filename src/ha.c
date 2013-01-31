@@ -366,11 +366,8 @@ static void ha_interface_cleanup(void)
 
 		/* Free addr_list */
 		list_for_each_safe(l2, n2, &i->addr_list) {
-			struct ha_addr_holder *addr;
-		
 			list_del(l2);
-			addr = list_entry(l2, struct ha_addr_holder, list);
-			free(addr);
+			free(list_entry(l2, struct ha_addr_holder, list));
 		}
 
 		/* Free ha_interface */

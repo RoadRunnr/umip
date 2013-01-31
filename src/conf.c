@@ -48,6 +48,7 @@
 #include "mipv6.h"
 #include "mn.h"
 #include "prefix.h"
+#include "ipsec.h"
 #ifdef ENABLE_VT
 #include "vt.h"
 #endif
@@ -374,8 +375,6 @@ void conf_show(struct mip6_config *c)
 void conf_free(struct mip6_config *c)
 {
 	struct list_head *h, *nh;
-	struct home_addr_info *hai;
-	struct net_iface *iface;
 
 	if (c->config_file) {
 		free(c->config_file);
@@ -385,21 +384,38 @@ void conf_free(struct mip6_config *c)
 
 	/* Cleanup the net_ifaces list */
 	list_for_each_safe(h, nh, &c->net_ifaces) {
-		iface = list_entry(h, struct net_iface, list);
 		list_del(h);
-		free(iface);
+		free(list_entry(h, struct net_iface, list));
 	}
 
 	/* For each home_addr_info, we have to remove the 
 	 * intern lists mob_net_prefix and ro_policy */
 	list_for_each_safe(h, nh, &c->home_addrs) {
-		hai = list_entry(h, struct home_addr_info, list);
+		struct home_addr_info *hai;
 		list_del(h);
 
+		hai = list_entry(h, struct home_addr_info, list);
 		prefix_list_free(&hai->ro_policies);
 		prefix_list_free(&hai->mob_net_prefixes);
-
 		free(hai);
 	}
+
+	/* Free the ipsec_policies list */
+	list_for_each_safe(h, nh, &c->ipsec_policies) {
+		list_del(h);
+		free(list_entry(h, struct ipsec_policy_entry, list));
+	}
+
+	/* Free the nemo_ha_served_prefixes list */
+	prefix_list_free(&c->nemo_ha_served_prefixes);
+
+	/* bind_acl is cleaned by by policy.c/policy_cleanup() */
+
+	/* Free debug_log_file and MoveModulePath,
+	 * allocated by gram.y */
+	if (c->debug_log_file)
+		free (c->debug_log_file);
+	if (c->MoveModulePath)
+		free (c->MoveModulePath);
 }
 

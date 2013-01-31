@@ -451,6 +451,7 @@ linksub		: QSTRING '{' linkdefs '}'
 			if (IN6_IS_ADDR_UNSPECIFIED(&hai.hoa.addr)) {
 				uerror("No home addresses defined"
 					"for homelink %d", hai.if_home);
+				free($1);
 				return -1;
 			}
 			strncpy(hai.name, $1, IF_NAMESIZE - 1);
@@ -623,6 +624,7 @@ ipsecpolicydef	: ipsectype ipsecprotos ipsecreqid xfrmaction ';'
 				case IPSEC_POLICY_TYPE_TUNNELMH:
 				case IPSEC_POLICY_TYPE_TUNNELPAYLOAD:
 					uerror("cannot use IPsec tunnel because it is not built with MIGRATE");
+					free(e);
 					return -1;
 				default:
 					break;
@@ -631,6 +633,7 @@ ipsecpolicydef	: ipsectype ipsecprotos ipsecreqid xfrmaction ';'
 #ifndef MULTIPROTO_MIGRATE
 				if ($2 != IPSEC_PROTO_ESP) {
 					uerror("only UseESP is allowed");
+					free(e);
 					return -1;
 				}
 #endif
@@ -649,6 +652,7 @@ ipsecpolicydef	: ipsectype ipsecprotos ipsecreqid xfrmaction ';'
 					       "pair\n",
 					       NIP6ADDR(&e->ha_addr),
 					       NIP6ADDR(&e->mn_addr));
+					free(e);
 					return -1;
 				}
 				list_add_tail(&e->list, &conf.ipsec_policies);
@@ -721,6 +725,8 @@ movemodule	: INTERNAL
 		}
 		| QSTRING
 		{
+			/* Unused at the moment */
+			free($1);
 			conf.MoveModulePath = NULL;
 		}
 		;
@@ -729,8 +735,10 @@ policymodule	: QSTRING
 		{
 			if (pmgr_init($1, &conf.pmgr) < 0) {
 				uerror("error loading shared object %s", $1);
+				free($1);
 				return -1;
 			}
+			free($1);
 		}
 		;
 
