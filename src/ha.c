@@ -347,6 +347,37 @@ static void ha_proxy_nd_cleanup(void)
 	}
 }
 
+static void ha_interface_cleanup(void)
+{
+	struct list_head *l1, *n1;
+
+	list_for_each_safe(l1, n1, &ha_interfaces) {
+		struct list_head *l2, *n2;
+		struct ha_interface *i;
+
+		list_del(l1);
+		i = list_entry(l1, struct ha_interface, iflist);
+
+		/* Free ha_list */
+		dhaad_del_halist(i);
+
+		/* Free prefix_list */
+		mdp_del_pinfo(i);
+
+		/* Free addr_list */
+		list_for_each_safe(l2, n2, &i->addr_list) {
+			struct ha_addr_holder *addr;
+		
+			list_del(l2);
+			addr = list_entry(l2, struct ha_addr_holder, list);
+			free(addr);
+		}
+
+		/* Free ha_interface */
+		free(i);
+	}
+}
+
 #ifdef ENABLE_VT
 struct ha_vt_arg {
 	const struct vt_handle *vh;
@@ -1278,4 +1309,5 @@ void ha_cleanup(void)
 		 &in6addr_any, 0, &in6addr_any, 0, 0);
 	mpd_ha_cleanup();
 	dhaad_ha_cleanup();
+	ha_interface_cleanup();
 }

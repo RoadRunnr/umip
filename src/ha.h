@@ -14,8 +14,8 @@ struct ha_interface {
 	struct list_head addr_list;
 	struct list_head ha_list;	/* protected by ha_lock */
 	uint16_t mpa_flags;		/* protected by mpa_lock */
-	struct list_head prefix_list;	/* protected by mpa_lock */
-	int prefix_count;		/* protected by mpa_lock */
+	struct list_head prefix_list;	/* protected by prefix_lock */
+	int prefix_count;		/* protected by prefix_lock */
 	struct list_head iflist;
 };
 

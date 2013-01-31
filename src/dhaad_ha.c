@@ -137,6 +137,21 @@ void dhaad_insert_halist(struct ha_interface *i, uint16_t key,
 	return;
 }
 
+void dhaad_del_halist(struct ha_interface *i)
+{
+	struct list_head *l, *n;
+
+	pthread_rwlock_wrlock(&ha_lock);
+	list_for_each_safe(l, n, &i->ha_list) {
+		struct home_agent *ha;
+		list_del(l);
+		ha = list_entry(l, struct home_agent, list);
+		del_task(&ha->tqe);
+		free(ha);
+	}
+	pthread_rwlock_unlock(&ha_lock);
+}
+
 static int dhaad_get_halist(struct ha_interface *i, uint16_t flags,
 			    int max, struct iovec *iov)
 {

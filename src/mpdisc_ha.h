@@ -29,6 +29,7 @@ int mpd_handle_pinfo(struct ha_interface *iface,
 		     struct nd_opt_prefix_info *pinfo);
 
 void mpd_del_expired_pinfos(struct ha_interface *i);
+void mdp_del_pinfo(struct ha_interface *i);
 
 void mpd_cancel_mpa(const struct in6_addr *ha, const struct in6_addr *hoa);
 int mpd_start_mpa(const struct in6_addr *ha, const struct in6_addr *hoa);
