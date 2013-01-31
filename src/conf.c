@@ -47,6 +47,7 @@
 #include "util.h"
 #include "mipv6.h"
 #include "mn.h"
+#include "cn.h"
 #include "prefix.h"
 #include "ipsec.h"
 #ifdef ENABLE_VT
@@ -232,6 +233,7 @@ static void conf_default(struct mip6_config *c)
 
 	/* CN bindings */
 	c->DoRouteOptimizationCN = 1;
+	INIT_LIST_HEAD(&c->cn_binding_pol);
 }
 
 int conf_parse(struct mip6_config *c, int argc, char **argv)
@@ -285,6 +287,16 @@ void conf_show(struct mip6_config *c)
 	    (c->debug_log_file ? c->debug_log_file : "stderr"));
 	dbg("DoRouteOptimizationCN = %s\n",
 	    CONF_BOOL_STR(c->DoRouteOptimizationCN));
+	list_for_each(list, &c->cn_binding_pol) {
+		struct cn_binding_pol_entry *pol;
+		pol = list_entry(list, struct cn_binding_pol_entry, list);
+		dbg("CnBindingPolicySet %x:%x:%x:%x:%x:%x:%x:%x "
+		    "%x:%x:%x:%x:%x:%x:%x:%x %s\n",
+		    NIP6ADDR(&pol->remote_hoa),
+		    NIP6ADDR(&pol->local_addr),
+		    pol->bind_policy ? "enabled" : "disabled" );
+	}
+
 	dbg("NonVolatileBindingCache = %s\n",
 	    CONF_BOOL_STR(c->NonVolatileBindingCache));
 	if (c->pmgr.so_path)
@@ -410,6 +422,7 @@ void conf_free(struct mip6_config *c)
 	prefix_list_free(&c->nemo_ha_served_prefixes);
 
 	/* bind_acl is cleaned by by policy.c/policy_cleanup() */
+	/* cn_binding_pol is cleaned by by cn.c/cn_cleanup() */
 
 	/* Free debug_log_file and MoveModulePath,
 	 * allocated by gram.y */

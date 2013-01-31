@@ -40,6 +40,7 @@
 #include "mipv6.h"
 #include "ha.h"
 #include "mn.h"
+#include "cn.h"
 #include "conf.h"
 #include "policy.h"
 #include "xfrm.h"
@@ -74,6 +75,7 @@ int mv_prefixes(struct list_head *list)
 }
 
 struct policy_bind_acl_entry *bae = NULL;
+struct cn_binding_pol_entry *cnbpol = NULL;
 
 struct ipsec_policy_set {
 	struct in6_addr ha;
@@ -194,6 +196,7 @@ static void uerror(const char *fmt, ...) {
 %token		ISMOBRTR
 %token		HASERVEDPREFIX
 %token		MOBRTRUSEEXPLICITMODE
+%token		CNBINDINGPOLICYSET
 
 %token		INV_TOKEN
 
@@ -366,6 +369,7 @@ topdef		: MIP6ENTITY mip6entity ';'
 		{
 			conf.NoHomeReturn = $2;
 		}
+		| CNBINDINGPOLICYSET  '{' cnbindingpoldefs '}'
 		;
 
 mip6entity	: MIP6CN { $$ = MIP6_ENTITY_CN;	}
@@ -717,6 +721,25 @@ mnropolicyaddr	: { $$ = in6addr_any; }
 		;
 
 dorouteopt	: BOOL { $$ = $1; }
+		;
+
+cnbindingpoldefs: cnbindingpoldef
+		| cnbindingpoldefs cnbindingpoldef
+		;
+
+cnbindingpoldef : ADDR mnropolicyaddr BOOL ';'
+		{
+			cnbpol = malloc(sizeof(struct cn_binding_pol_entry));
+			if (cnbpol == NULL) {
+				uerror("out of memory");
+				return -1;
+			}
+			memset(cnbpol, 0, sizeof(struct cn_binding_pol_entry));
+			cnbpol->remote_hoa = $1;
+			cnbpol->local_addr = $2;
+			cnbpol->bind_policy = $3;
+			list_add_tail(&cnbpol->list, &conf.cn_binding_pol);
+		}
 		;
 
 movemodule	: INTERNAL

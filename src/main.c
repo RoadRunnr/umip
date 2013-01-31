@@ -245,7 +245,8 @@ int main(int argc, char **argv)
 		goto icmp6_failed;
 	if (xfrm_init() < 0)
 		goto xfrm_failed;
-	cn_init();
+	if (cn_init() < 0)
+		goto cn_failed;
 	if ((is_ha() || is_mn()) && tunnelctl_init() < 0)
 		goto tunnelctl_failed;
 	if (is_ha() && ha_init() < 0) 
@@ -275,6 +276,7 @@ ha_failed:
 		tunnelctl_cleanup();
 tunnelctl_failed:
 	cn_cleanup();
+cn_failed:
 	xfrm_cleanup();
 xfrm_failed:
 	icmp6_cleanup();

@@ -234,6 +234,7 @@ DebugLevel			{ return DEBUGLEVEL; }
 DebugLogFile			{ return DEBUGLOGFILE; }
 DoRouteOptimizationCN		{ return DOROUTEOPTIMIZATIONCN; }
 DoRouteOptimizationMN		{ return DOROUTEOPTIMIZATIONMN; }
+CnBindingPolicySet		{ return CNBINDINGPOLICYSET; }
 HomeAddress			{ return HOMEADDRESS; }
 HomeAgentAddress		{ return HOMEAGENTADDRESS; }
 InitialBindackTimeoutFirstReg	{ return INITIALBINDACKTIMEOUTFIRSTREG; }
