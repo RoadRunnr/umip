@@ -597,6 +597,7 @@ int mh_send(const struct in6_addr_bundle *addrs, const struct iovec *mh_vec,
 	int iov_count;
 	socklen_t rthlen = 0;
 
+	memset(iov, 0, (2*(IP6_MHOPT_MAX+1))*sizeof(struct iovec));
 	iov_count = mh_try_pad(mh_vec, iov, iovlen);
 	mh = (struct ip6_mh *)iov[0].iov_base;
 	mh->ip6mh_hdrlen = (mh_length(iov, iov_count) >> 3) - 1;

@@ -269,6 +269,7 @@ static int xfrm_sendmigrate(struct xfrm_userpolicy_info *sp,
 
 	memset(&req, 0, sizeof(req));
 	memset(&um, 0, sizeof(um));
+	memset(&kma, 0, sizeof(kma));
 
 	req.n.nlmsg_len = NLMSG_LENGTH(sizeof(req.xpid));
 	req.n.nlmsg_flags = NLM_F_REQUEST;
