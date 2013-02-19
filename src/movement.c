@@ -1321,7 +1321,7 @@ static void md_probe_router(struct md_router *rtr)
 		struct in6_addr *rtr_addr = md_get_rtr_addr(rtr);
 		struct timespec expires;
 
-		MDBG2("preform NUD for router "
+		MDBG2("perform NUD for router "
 		      "%x:%x:%x:%x:%x:%x:%x:%x on interface %s (%d)\n", 
 		      NIP6ADDR(&rtr->lladdr), rtr->iface->name,
 		      rtr->iface->ifindex);
