@@ -424,6 +424,19 @@ Default: disabled
 Dynamic reload: supported.
 
 .TP
+.BR "MnResetDhaadAtHome" "boolean" ";"
+
+If the MN uses DHAAD, then enabling this option will force UMIP to set the 
+Home Agent Address to the unspecified address every time the MN returns
+home. As a consequence, the MN will run DHAAD every time it moves from
+home to a foreign network. If disabled, the HA address obtained from the
+very first DHAAD exchange will be remembered even if the MN returns home.
+
+Default: disabled
+
+Dynamic reload: supported.
+
+.TP
 .BR "SendMobPfxSols " "boolean" ";"
 
 Controls whether mobile node sends Mobile Prefix Solicitations to the

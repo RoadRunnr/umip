@@ -315,6 +315,8 @@ void conf_show(struct mip6_config *c)
 		dbg("MnMaxCnBindingLife = %u\n", c->MnMaxCnBindingLife);
 		dbg("MnDiscardHaParamProb = %s\n",
 		    CONF_BOOL_STR(c->MnDiscardHaParamProb));
+		dbg("MnResetDhaadAtHome = %s\n",
+		    CONF_BOOL_STR(c->MnResetDhaadAtHome));
 		dbg("SendMobPfxSols = %s\n",
 		    CONF_BOOL_STR(c->SendMobPfxSols));
 		dbg("DoRouteOptimizationMN = %s\n",

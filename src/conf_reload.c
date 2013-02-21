@@ -608,6 +608,14 @@ void conf_apply_changes(struct mip6_config *cur, struct mip6_config *new)
 		cur->MnDiscardHaParamProb = new->MnDiscardHaParamProb;
 	}
 
+	/* (MnResetDhaadAtHome) MnResetDhaadAtHome:
+	 * update the value in config */
+	if (new->MnResetDhaadAtHome != cur->MnResetDhaadAtHome) {
+		dbg("New MnResetDhaadAtHome: %s\n",
+		    new->MnResetDhaadAtHome ? "enabled" : "disabled");
+		cur->MnResetDhaadAtHome = new->MnResetDhaadAtHome;
+	}
+
 	/* (SendMobPfxSols) SendMobPfxSols: update the value in config */
 	if (new->SendMobPfxSols != cur->SendMobPfxSols) {
 		dbg("New SendMobPfxSols: %s\n",

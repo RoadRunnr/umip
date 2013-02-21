@@ -35,6 +35,7 @@
 #include "bul.h"
 #include "mn.h"
 #include "util.h"
+#include "conf.h"
 #include "xfrm.h"
 #include "debug.h"
 #include "retrout.h"
@@ -238,6 +239,8 @@ void bul_delete(struct bulentry *bule)
 				xfrm_unblock_ra(hai);
 			if (hai->home_block & NEMO_FWD_BLOCK)
 				xfrm_unblock_fwd(hai);
+			if (conf.MnResetDhaadAtHome && hai->use_dhaad)
+				hai->ha_addr = in6addr_any;
 		}
 	}
 	while (bule->ext_cleanup)
