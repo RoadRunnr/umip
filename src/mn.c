@@ -1727,7 +1727,15 @@ int mn_update_home_prefix(struct home_addr_info *hai,
 			addr_do(&hai->hoa.addr, plen,
 				hai->hoa.iif, &arg, flag_hoa);
 		}
-	} else if (hai->home_reg_status != HOME_REG_VALID) {
+	} else if (!hai->at_home && hai->home_reg_status != HOME_REG_VALID) {
+		/* The test '!hai->at_home' is done on purpose here: there
+		 * is a risk to loop forever if we are at home and
+		 * home_reg_status != HOME_REG_VALID (for example, because
+		 * the MN came back home before succeeding the first 
+		 * registration). Adding the HoA again would trigger
+		 * process_new_addr() which would end up here and trigger
+		 * process_new_addr() which would end up here etc. 
+		 * The HoA was updated already during mn_move() anyway */
 		if (hai->hoa.valid_time.tv_sec) {
 			addr_do(&hai->hoa.addr, 128, hai->hoa.iif, 
 				hai, update_hoa);
@@ -1744,7 +1752,7 @@ int mn_update_home_prefix(struct home_addr_info *hai,
 		
 		/* check if new HoA lifetime is smaller than current
 		   home registration lifetime */
-		MDBG2("preferred_time %u valid_life %u\n",
+		MDBG2("preferred_time %u valid_time %u\n",
 		      p.nd_opt_pi_preferred_time, p.nd_opt_pi_valid_time);
 		
 		if (mn_home_reg_addr_expires(e, &hai->hoa)) {
