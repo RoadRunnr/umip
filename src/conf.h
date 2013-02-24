@@ -46,6 +46,7 @@ struct mip6_config {
 	char MnUseAllInterfaces;
 	char MnDiscardHaParamProb;
 	char MnResetDhaadAtHome;
+	char MnForceHomeUponFailedDad;
 	char SendMobPfxSols;
 	char OptimisticHandoff;
 	char NoHomeReturn;

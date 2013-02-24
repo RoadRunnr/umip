@@ -2033,7 +2033,7 @@ static int mn_addr_do_dad(int fd, struct home_addr_info *hai,
 		if (ret == 0) {
 			if (add)
 				mn_hoa_add(hai, addr, plen, ifindex);
-			if (has_home_reg) {
+			if (has_home_reg == 1 /* Valid registration */) {
 				MDBG("HA didn't answer DAD probe!\n");
 				return -1;
 			} else {
@@ -2042,6 +2042,12 @@ static int mn_addr_do_dad(int fd, struct home_addr_info *hai,
 				     NIP6ADDR(addr));
 				if (!IN6_IS_ADDR_LINKLOCAL(addr) && hai)
 					mn_block_rule_del(hai);
+				/* If we are uncertain of the registration but DAD
+				 * succeeded, it probably means that the HA does not
+				 * have a valid entry entry. Return -1 to trigger 
+				 * the deletion of the BULE */
+				if (has_home_reg == 2)
+					return -1;
 				return 0;
 			}
 		} else {
@@ -2102,8 +2108,35 @@ static int mn_do_dad(struct home_addr_info *hai, int dereg)
 		if (dereg)
 			mn_send_home_na(hai);
 		ret = mn_move(hai);
+	} else if (hai->home_reg_status == HOME_REG_UNCERTAIN) {
+		/* When registration is uncertain, DAD will fail 
+		 * because linked is blocked by an XFRM rule. We
+		 * unblock the link during the DAD process */
+		int block = 0;
+		if (hai->home_block & HOME_LINK_BLOCK) {
+			block = 1;
+			xfrm_unblock_link(hai);
+		}
+		if (mn_addr_do_dad(sock, hai, &hai->hoa.addr,
+				   hai->plen, hai->primary_coa.iif,
+				   2 /* registration is uncertain */) < 0) {
+			/* The HA did not answer to the DAD probe: it
+			 * probably does not have a registration for
+			 * that MN. We flush the BUL */
+			MDBG("HA does not seem to have a valid registration\n");
+			bul_iterate(&hai->bul, _bul_flush, &type);
+		} else if (block) {
+			xfrm_block_link(hai);
+		}
+		ret = mn_move(hai);
 	} else if (!mn_addr_do_dad(sock, hai, &hai->hoa.addr, 
 				   hai->plen, hai->primary_coa.iif, 1)) {
+		ret = mn_move(hai);
+	} else if (conf.MnForceHomeUponFailedDad) {
+		/* If we have a valid home registration but
+		 * the HA does not reply to the DAD probe, 
+		 * we force the reinitialization of the MN */
+		bul_iterate(&hai->bul, _bul_flush, &type);
 		ret = mn_move(hai);
 	}
 out:

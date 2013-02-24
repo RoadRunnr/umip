@@ -437,6 +437,18 @@ Default: disabled
 Dynamic reload: supported.
 
 .TP
+.BR "MnForceHomeUponFailedDad " "boolean" ";"
+
+If we have a valid home registration but the HA does not reply to 
+DAD probe when returning home, setting this option to enabled will
+force the returning home procedure and flush the Binding Update List
+of the MN. 
+
+Default: disabled
+
+Dynamic reload: supported.
+
+.TP
 .BR "SendMobPfxSols " "boolean" ";"
 
 Controls whether mobile node sends Mobile Prefix Solicitations to the

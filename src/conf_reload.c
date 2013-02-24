@@ -616,6 +616,14 @@ void conf_apply_changes(struct mip6_config *cur, struct mip6_config *new)
 		cur->MnResetDhaadAtHome = new->MnResetDhaadAtHome;
 	}
 
+	/* (MnForceHomeUponFailedDad) MnForceHomeUponFailedDad:
+	 * update the value in config */
+	if (new->MnForceHomeUponFailedDad != cur->MnForceHomeUponFailedDad) {
+		dbg("New MnForceHomeUponFailedDad: %s\n",
+		    new->MnForceHomeUponFailedDad ? "enabled" : "disabled");
+		cur->MnForceHomeUponFailedDad = new->MnForceHomeUponFailedDad;
+	}
+
 	/* (SendMobPfxSols) SendMobPfxSols: update the value in config */
 	if (new->SendMobPfxSols != cur->SendMobPfxSols) {
 		dbg("New SendMobPfxSols: %s\n",

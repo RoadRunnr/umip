@@ -286,6 +286,7 @@ MnRouterProbes			{ return MNROUTERPROBES; }
 MnRouterProbeTimeout		{ return MNROUTERPROBETIMEOUT; }
 MnDiscardHaParamProb		{ return MNDISCARDHAPARAMPROB; }
 MnResetDhaadAtHome		{ return MNRESETDHAADATHOME; }
+MnForceHomeUponFailedDad	{ return MNFORCEHOMEUPONFAILEDDAD; }
 OptimisticHandoff		{ return OPTIMISTICHANDOFF; }
 NoHomeReturn                    { return NOHOMERETURN; }
 HaAcceptMobRtr   		{ return HAACCEPTMOBRTR; }

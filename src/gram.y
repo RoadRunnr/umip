@@ -190,6 +190,7 @@ static void uerror(const char *fmt, ...) {
 %token		MNROUTERPROBETIMEOUT
 %token		MNDISCARDHAPARAMPROB
 %token		MNRESETDHAADATHOME
+%token		MNFORCEHOMEUPONFAILEDDAD
 %token		OPTIMISTICHANDOFF
 %token		NOHOMERETURN
 %token		HOMEPREFIX
@@ -365,6 +366,10 @@ topdef		: MIP6ENTITY mip6entity ';'
 		| MNRESETDHAADATHOME BOOL ';'
 		{
 			conf_parsed->MnResetDhaadAtHome = $2;
+		}
+		| MNFORCEHOMEUPONFAILEDDAD BOOL ';'
+		{
+			conf_parsed->MnForceHomeUponFailedDad = $2;
 		}
 		| OPTIMISTICHANDOFF BOOL ';' 
 		{
