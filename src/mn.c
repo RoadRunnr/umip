@@ -2478,18 +2478,18 @@ static void mn_chk_ho_verdict(struct home_addr_info *hai,
 
 /* Iterate on existing home address info structures, check verdict for each and
  * then perform movement if verdict is positive. Just do nothing if at home or
- * waiting for BA. Function must be called with rw lock acquired on mn_lock */
+ * waiting for BA (unless we are uncertain about the success of the first 
+ * registration). Function must be called with rw lock acquired on mn_lock */
 static void mn_move_positive_non_home(void)
 {
 	struct list_head *lh;
 	struct home_addr_info *hai;
 
-	if (pending_bas)
-		return;
-
 	list_for_each(lh, &home_addr_list) {
 		hai = list_entry(lh, struct home_addr_info, list);
-		if (!hai->at_home && positive_ho_verdict(hai->verdict))
+		if (!hai->at_home
+		    && (!pending_bas || hai->home_reg_status == HOME_REG_UNCERTAIN)
+		    && positive_ho_verdict(hai->verdict))
 			mn_move(hai);
 	}
 }
