@@ -1597,7 +1597,7 @@ int xfrm_add_bce(const struct in6_addr *our_addr,
 
 	/* Create policy for outbound RO data traffic */
 	set_selector(peer_addr, our_addr, 0, 0, 0, 0, &sel);
-	if (xfrm_state_add(&sel, IPPROTO_ROUTING, coa, replace, 0)){
+	if (xfrm_state_add(&sel, IPPROTO_ROUTING, coa, replace, 0)) {
 		/* 
 		 * WORKAROUND 
 		 * In some cases, MN fail to add it because of the state
@@ -1607,7 +1607,7 @@ int xfrm_add_bce(const struct in6_addr *our_addr,
 			return -1;
 	}
 	set_selector(our_addr, peer_addr, 0, 0, 0, 0, &sel);
-	if (xfrm_state_add(&sel, IPPROTO_DSTOPTS, coa, replace, 0)){
+	if (xfrm_state_add(&sel, IPPROTO_DSTOPTS, coa, replace, 0)) {
 		/* 
 		 * WORKAROUND 
 		 * In some cases, MN fail to add it because of the state
@@ -1889,12 +1889,22 @@ int xfrm_pre_bu_add_bule(struct bulentry *bule)
 			exist = 1;
 		}
 	}
-	if(!exist &&_mn_bule_ro_pol_add(bule, bule->home->if_tunnel, rdata))
+	if(!exist && _mn_bule_ro_pol_add(bule, bule->home->if_tunnel, rdata))
 		return -1;
 	set_selector(&bule->peer_addr, &bule->hoa, 0, 0, 0, 0, &sel);
 	/* XXX: acquired state is already inserted */
 	if (!(bule->flags & IP6_MH_BU_HOME)) {
-		XDBG2("%s: original rdata = %d\n", __FUNCTION__, rdata);
+		/* We need to delete the previously installed state
+		 * if we update the acquire state. Basically, we
+		 * delete the state if a state exists (rdata > 0), if
+		 * the CoA has changed, and if the last CoA is not
+		 * the HoA */
+		if (rdata 
+		    && !IN6_ARE_ADDR_EQUAL(&bule->coa, &bule->last_coa)
+		    && !IN6_ARE_ADDR_EQUAL(&bule->last_coa, &bule->hoa))
+			xfrm_state_del(IPPROTO_DSTOPTS, &sel);
+
+		XDBG2("original rdata = %d\n", rdata);
 		rdata = 1;
 	}
 	return xfrm_state_add(&sel, IPPROTO_DSTOPTS, &bule->coa, rdata, 0);
