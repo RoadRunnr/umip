@@ -273,17 +273,32 @@ Removing rules for established bindings may have unpredicted effects.
 has the following format:
 
 .TP
-.BR "IPsecPolicy " "type " "UseESP" "number number" ";"
+.BR "IPsecPolicy " "type " "UseESP " "number number" ";"
 
 Field 
 .B type 
-can be one of HomeRegBinding, Mh, MobPfxDisc, ICMP, any, TunnelMh,
-TunnelHomeTesting, or TunnelPayload.  The any option protects all
-transport mode communication between the MN and HA.  Currently only
-the ESP IPsec protocol is supported, but in the future AH and IPComp
-might also be available.  The two remaining numeric fields are the
-IPsec reqid values, the first one used for MN - HA, the second one for
-HA - MN communication.  If just one value is defined, the same reqid
+can be one of 
+.B HomeRegBinding
+(for protecting BU/BH),
+.B Mh
+(for protecting all MH packets: BU, BA, BE),
+.B MobPfxDisc
+(for protecting MPS/MPA),
+.B ICMP
+(for protecting all ICMP packets, including MPS/MPA),
+.B any
+(for protecting all transport mode communication),
+.B TunnelHomeTesting
+(for protecting the HoTI/HoT messages),
+.B TunnelMh
+(for protecting all tunneled MH packets, including HoTI/HoT), or
+.B TunnelPayload
+(for protecting all tunneled packets including tunneled MH packets).
+
+Currently only the ESP IPsec protocol is supported, but in the future
+AH and IPComp might also be available.  The two remaining numeric fields 
+are the IPsec reqid values, the first one used for MN - HA, the second one
+for HA - MN communication.  If just one value is defined, the same reqid
 will be used in both directions.  If no reqid is given, reqid will not
 be used.
 
