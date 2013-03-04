@@ -1896,10 +1896,10 @@ int xfrm_pre_bu_add_bule(struct bulentry *bule)
 	if (!(bule->flags & IP6_MH_BU_HOME)) {
 		/* We need to delete the previously installed state
 		 * if we update the acquire state. Basically, we
-		 * delete the state if a state exists (rdata > 0), if
+		 * delete the state if a state exists ('exist' == 1), if
 		 * the CoA has changed, and if the last CoA is not
 		 * the HoA */
-		if (rdata 
+		if (exist
 		    && !IN6_ARE_ADDR_EQUAL(&bule->coa, &bule->last_coa)
 		    && !IN6_ARE_ADDR_EQUAL(&bule->last_coa, &bule->hoa))
 			xfrm_state_del(IPPROTO_DSTOPTS, &sel);
