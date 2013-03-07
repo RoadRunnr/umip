@@ -1132,8 +1132,8 @@ static int xfrm_cn_init(void)
 	/* Let Neighbor Solicitation messages bypass bindings */
 	set_selector(&in6addr_any, &in6addr_any,
 		     IPPROTO_ICMPV6, ND_NEIGHBOR_SOLICIT, 0, 0, &sel);
-	if (xfrm_mip_policy_add(&sel, 0, XFRM_POLICY_OUT, XFRM_POLICY_ALLOW,
-				MIP6_PRIO_NO_RO_SIG_ANY, NULL, 0) < 0)
+	if (xfrm_ipsec_policy_add(&sel, 0, XFRM_POLICY_OUT, XFRM_POLICY_ALLOW,
+				  MIP6_PRIO_NO_RO_SIG_ANY, NULL, 0) < 0)
 		return -1;
 
 	/*
@@ -1143,8 +1143,8 @@ static int xfrm_cn_init(void)
 	 */
 	set_selector(&in6addr_any, &in6addr_any,
 		     IPPROTO_ICMPV6, ND_NEIGHBOR_ADVERT, 0, 0, &sel);
-	if (xfrm_mip_policy_add(&sel, 0, XFRM_POLICY_OUT, XFRM_POLICY_ALLOW,
-				MIP6_PRIO_HOME_SIG_ANY, NULL, 0) < 0)
+	if (xfrm_ipsec_policy_add(&sel, 0, XFRM_POLICY_OUT, XFRM_POLICY_ALLOW,
+				  MIP6_PRIO_HOME_SIG_ANY, NULL, 0) < 0)
 		return -1;
 
 	/* Let ICMPv6 error messages bypass bindings */
@@ -1171,11 +1171,11 @@ static void xfrm_cn_cleanup(void)
 
 	set_selector(&in6addr_any, &in6addr_any,
 		     IPPROTO_ICMPV6, ND_NEIGHBOR_SOLICIT, 0, 0, &sel);
-	xfrm_mip_policy_del(&sel, XFRM_POLICY_OUT);
+	xfrm_ipsec_policy_del(&sel, XFRM_POLICY_OUT);
 
 	set_selector(&in6addr_any, &in6addr_any,
 		     IPPROTO_ICMPV6, ND_NEIGHBOR_ADVERT, 0, 0, &sel);
-	xfrm_mip_policy_del(&sel, XFRM_POLICY_OUT);
+	xfrm_ipsec_policy_del(&sel, XFRM_POLICY_OUT);
 
 	set_selector(&in6addr_any, &in6addr_any,
 		     IPPROTO_ICMPV6, 0, 0, 0, &sel);

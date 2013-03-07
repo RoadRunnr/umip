@@ -140,7 +140,7 @@ static void _set_sp(struct xfrm_userpolicy_info *sp,
 		sp->priority = MIP6_PRIO_RO_SIG_RR;
 		break;
 	case IPSEC_POLICY_TYPE_TUNNELPAYLOAD:
-		sp->priority = MIP6_PRIO_RO_SIG_RR;
+		sp->priority = MIP6_PRIO_NO_RO_DATA;
 		break;
 
 		/* Transport */
