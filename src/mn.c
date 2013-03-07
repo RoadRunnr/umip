@@ -517,7 +517,21 @@ static void bu_resend(struct tq_elem *tqe)
 		}
 
 		hai = bule->home;
-		MDBG("Bul resend [%p] type %d\n",  bule, bule->type);
+		MDBG("BU resend type %d\n", bule->type);
+
+		/* If MN is at home, registration is uncertain and option 
+		 * MnFlushAllAtHome is set, we delete the corresponding BUL.
+		 * The registration was probably not valid in the first place.
+		 * It avoids the MN to keep trying until the retry limit is
+		 * reached. 
+		 */
+		if (conf.MnFlushAllAtHome
+		    && hai->at_home
+		    && hai->home_reg_status == HOME_REG_UNCERTAIN) {
+			MDBG("Deleting BULE due to uncertain registration\n");
+			bul_delete(bule);
+			goto out;
+		}
 
 		clock_gettime(CLOCK_REALTIME, &bule->lastsent);
 		tsadd(bule->delay, bule->delay, bule->delay);
@@ -535,8 +549,7 @@ static void bu_resend(struct tq_elem *tqe)
 			clock_gettime(CLOCK_REALTIME, &now);
 			bule_invalidate(bule, &now, 0);
 			mn_change_ha(hai);
-			pthread_rwlock_unlock(&mn_lock);
-			return;
+			goto out;
 		}
 		mn_send_bu_msg(bule);
 
@@ -563,7 +576,7 @@ static void bu_refresh(struct tq_elem *tqe)
 			goto out;
 		}
 
-		MDBG("Bul refresh type: %d\n", bule->type);
+		MDBG("BU refresh type: %d\n", bule->type);
 
 		clock_gettime(CLOCK_REALTIME, &bule->lastsent);
 
@@ -2132,7 +2145,7 @@ static int mn_do_dad(struct home_addr_info *hai, int dereg)
 	} else if (!mn_addr_do_dad(sock, hai, &hai->hoa.addr, 
 				   hai->plen, hai->primary_coa.iif, 1)) {
 		ret = mn_move(hai);
-	} else if (conf.MnForceHomeUponFailedDad) {
+	} else if (conf.MnFlushAllAtHome) {
 		/* If we have a valid home registration but
 		 * the HA does not reply to the DAD probe, 
 		 * we force the reinitialization of the MN */
@@ -2543,6 +2556,18 @@ int mn_rr_start_handoff(void *vbule, __attribute__ ((unused)) void *dummy)
 		MDBG("Returning home, no need for Care-of keygen token\n");
 		bule->dereg = 1;
 		tsclear(bule->lifetime);
+		
+		/* If MN is at home, RO is incomplete and option
+		 * MnFlushAllAtHome is set, we delete the corresponding BUL.
+		 * The registration was probably not valid in the first place.
+		 * It avoids the MN to keep trying finishing the RO procedure
+		 * until the BUL entry expires.
+		 */
+		if (conf.MnFlushAllAtHome
+		    && bule->rr.state != RR_READY) {
+			MDBG("Deleting BULE due to incomplete RO\n");
+			goto delete_entry;
+		}
 	}
 	bule->if_coa = mn_get_ro_coa(&bule->peer_addr, bule->home, &bule->coa);
 	if (bule->if_coa < 0)

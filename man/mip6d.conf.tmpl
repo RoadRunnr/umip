@@ -452,12 +452,13 @@ Default: disabled
 Dynamic reload: supported.
 
 .TP
-.BR "MnForceHomeUponFailedDad " "boolean" ";"
+.BR "MnFlushAllAtHome " "boolean" ";"
 
-If we have a valid home registration but the HA does not reply to 
-DAD probe when returning home, setting this option to enabled will
-force the returning home procedure and flush the Binding Update List
-of the MN. 
+Enabling this option allows the MN to flush all uncertain registrations
+upon returning home, instead of keeping trying to complete them from home
+until the retry counters expire. Also, this option forces the returning
+home procedure for valid registrations in the case the HA does not reply
+to DAD probe when returning home.
 
 Default: disabled
 

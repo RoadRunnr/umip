@@ -317,8 +317,8 @@ void conf_show(struct mip6_config *c)
 		    CONF_BOOL_STR(c->MnDiscardHaParamProb));
 		dbg("MnResetDhaadAtHome = %s\n",
 		    CONF_BOOL_STR(c->MnResetDhaadAtHome));
-		dbg("MnForceHomeUponFailedDad = %s\n",
-		    CONF_BOOL_STR(c->MnForceHomeUponFailedDad));
+		dbg("MnFlushAllAtHome = %s\n",
+		    CONF_BOOL_STR(c->MnFlushAllAtHome));
 		dbg("SendMobPfxSols = %s\n",
 		    CONF_BOOL_STR(c->SendMobPfxSols));
 		dbg("DoRouteOptimizationMN = %s\n",

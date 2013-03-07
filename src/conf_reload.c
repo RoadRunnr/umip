@@ -616,12 +616,12 @@ void conf_apply_changes(struct mip6_config *cur, struct mip6_config *new)
 		cur->MnResetDhaadAtHome = new->MnResetDhaadAtHome;
 	}
 
-	/* (MnForceHomeUponFailedDad) MnForceHomeUponFailedDad:
+	/* (MnFlushAllAtHome) MnFlushAllAtHome:
 	 * update the value in config */
-	if (new->MnForceHomeUponFailedDad != cur->MnForceHomeUponFailedDad) {
-		dbg("New MnForceHomeUponFailedDad: %s\n",
-		    new->MnForceHomeUponFailedDad ? "enabled" : "disabled");
-		cur->MnForceHomeUponFailedDad = new->MnForceHomeUponFailedDad;
+	if (new->MnFlushAllAtHome != cur->MnFlushAllAtHome) {
+		dbg("New MnFlushAllAtHome: %s\n",
+		    new->MnFlushAllAtHome ? "enabled" : "disabled");
+		cur->MnFlushAllAtHome = new->MnFlushAllAtHome;
 	}
 
 	/* (SendMobPfxSols) SendMobPfxSols: update the value in config */
