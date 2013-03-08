@@ -1116,8 +1116,9 @@ static int xfrm_cn_init(void)
 
 	XDBG("Adding policies and states for CN\n");
 
-	/* Create policy for all BUs with home flag NOT set to 
-	   use home address option */
+	/* Create policy for all BUs with home flag NOT set to
+	 * use home address option. 
+	 */
 	if (cn_wildrecv_bu_pol_add())
 		return -1;
 
@@ -1129,20 +1130,30 @@ static int xfrm_cn_init(void)
 	if (xfrm_cn_policy_mh_out_touch(0) < 0)
 		return -1;
 
-	/* Let Neighbor Solicitation messages bypass bindings */
+	/* Let Neighbor Solicitation messages bypass bindings.
+	 * We add both a MAIN and SUB policy in order to bypass the 
+	 * SUB block and the potential MAIN IPsec policies.
+	 */
 	set_selector(&in6addr_any, &in6addr_any,
 		     IPPROTO_ICMPV6, ND_NEIGHBOR_SOLICIT, 0, 0, &sel);
+	if (xfrm_mip_policy_add(&sel, 0, XFRM_POLICY_OUT, XFRM_POLICY_ALLOW,
+				MIP6_PRIO_NO_RO_SIG_ANY, NULL, 0) < 0)
+		return -1;
 	if (xfrm_ipsec_policy_add(&sel, 0, XFRM_POLICY_OUT, XFRM_POLICY_ALLOW,
 				  MIP6_PRIO_NO_RO_SIG_ANY, NULL, 0) < 0)
 		return -1;
 
-	/*
-	 * Let Neighbor Advertisement messages bypass bindings 
+	/* Let Neighbor Advertisement messages bypass bindings
 	 * This policy is high priority(priory 3) not to block 
-	 * by the BlockPolicy during registration.
+	 * by the BlockPolicy during registration. We add both a 
+	 * MAIN and SUB policy in order to bypass the SUB block 
+	 * and the potential MAIN IPsec policies.
 	 */
 	set_selector(&in6addr_any, &in6addr_any,
 		     IPPROTO_ICMPV6, ND_NEIGHBOR_ADVERT, 0, 0, &sel);
+	if (xfrm_mip_policy_add(&sel, 0, XFRM_POLICY_OUT, XFRM_POLICY_ALLOW,
+				MIP6_PRIO_HOME_SIG_ANY, NULL, 0) < 0)
+		return -1;
 	if (xfrm_ipsec_policy_add(&sel, 0, XFRM_POLICY_OUT, XFRM_POLICY_ALLOW,
 				  MIP6_PRIO_HOME_SIG_ANY, NULL, 0) < 0)
 		return -1;
@@ -1171,10 +1182,12 @@ static void xfrm_cn_cleanup(void)
 
 	set_selector(&in6addr_any, &in6addr_any,
 		     IPPROTO_ICMPV6, ND_NEIGHBOR_SOLICIT, 0, 0, &sel);
+	xfrm_mip_policy_del(&sel, XFRM_POLICY_OUT);
 	xfrm_ipsec_policy_del(&sel, XFRM_POLICY_OUT);
 
 	set_selector(&in6addr_any, &in6addr_any,
 		     IPPROTO_ICMPV6, ND_NEIGHBOR_ADVERT, 0, 0, &sel);
+	xfrm_mip_policy_del(&sel, XFRM_POLICY_OUT);
 	xfrm_ipsec_policy_del(&sel, XFRM_POLICY_OUT);
 
 	set_selector(&in6addr_any, &in6addr_any,
