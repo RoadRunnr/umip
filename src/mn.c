@@ -1259,12 +1259,20 @@ static void mn_process_cn_ba(struct ip6_mh_binding_ack *ba, ssize_t len,
 		MDBG("unexpected BA, ignoring\n");
 		return;
 	}
-	bule->wait_ack = 0;
 
 	tssetsec(ba_lifetime, ntohs(ba->ip6mhba_lifetime) << 2);
 	br_adv = ba_lifetime;
 	tsadd(bule->lastsent, ba_lifetime, bule->hard_expire);
-	post_ba_bul_update(bule);
+
+	/* If MN received a BA status 135, we do not update
+	 * the XFRM policies (packets must still be sent using
+	 * reverse tunneling) and we still expect a BA (from
+	 * the previous mn_send_bu_msg() call).
+	 */
+	if (ba->ip6mhba_status != IP6_MH_BAS_SEQNO_BAD) {
+		post_ba_bul_update(bule);
+		bule->wait_ack = 0;
+	}
 
 	if (!tsisset(ba_lifetime)) {
 		dbg("Deleting bul entry\n");
