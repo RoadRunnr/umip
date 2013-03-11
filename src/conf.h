@@ -33,6 +33,8 @@ struct mip6_config {
 	unsigned int MnMaxHaBindingLife;
 	unsigned int MnMaxCnBindingLife;
 	unsigned int MnRouterProbes;
+	unsigned int MnMaxCnConsecutiveResends;
+	unsigned int MnMaxHaConsecutiveResends;
 	struct timespec MnRouterProbeTimeout_ts;
 	struct timespec InitialBindackTimeoutFirstReg_ts;
 	struct timespec InitialBindackTimeoutReReg_ts;

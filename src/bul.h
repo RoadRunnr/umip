@@ -40,7 +40,7 @@ struct bulentry {
 	struct timespec delay;		/* call back time in ms*/
 	struct timespec expires;        /* Absolute time for timer expire */
 	struct timespec hard_expire;    /* Absolute bulentry expiry time */
-	int consecutive_resends;	/* Number of consecutive BU's resent */
+	uint16_t consecutive_resends;	/* Number of consecutive BU's resent */
 	int8_t coa_changed;
 	uint8_t wait_ack;      		/* WAIT / READY */
 	uint8_t xfrm_state;

@@ -191,6 +191,8 @@ static void uerror(const char *fmt, ...) {
 %token		MNDISCARDHAPARAMPROB
 %token		MNRESETDHAADATHOME
 %token		MNFLUSHALLATHOME
+%token		MNMAXHACONSECUTIVERESENDS
+%token		MNMAXCNCONSECUTIVERESENDS
 %token		OPTIMISTICHANDOFF
 %token		NOHOMERETURN
 %token		HOMEPREFIX
@@ -370,6 +372,14 @@ topdef		: MIP6ENTITY mip6entity ';'
 		| MNFLUSHALLATHOME BOOL ';'
 		{
 			conf_parsed->MnFlushAllAtHome = $2;
+		}
+		| MNMAXHACONSECUTIVERESENDS NUMBER ';' 
+		{
+			conf_parsed->MnMaxHaConsecutiveResends = $2;
+		}
+		| MNMAXCNCONSECUTIVERESENDS NUMBER ';' 
+		{
+			conf_parsed->MnMaxCnConsecutiveResends = $2;
 		}
 		| OPTIMISTICHANDOFF BOOL ';' 
 		{

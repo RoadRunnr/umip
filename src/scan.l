@@ -287,6 +287,8 @@ MnRouterProbeTimeout		{ return MNROUTERPROBETIMEOUT; }
 MnDiscardHaParamProb		{ return MNDISCARDHAPARAMPROB; }
 MnResetDhaadAtHome		{ return MNRESETDHAADATHOME; }
 MnFlushAllAtHome		{ return MNFLUSHALLATHOME; }
+MnMaxHaConsecutiveResends	{ return MNMAXHACONSECUTIVERESENDS; }
+MnMaxCnConsecutiveResends	{ return MNMAXCNCONSECUTIVERESENDS; }
 OptimisticHandoff		{ return OPTIMISTICHANDOFF; }
 NoHomeReturn                    { return NOHOMERETURN; }
 HaAcceptMobRtr   		{ return HAACCEPTMOBRTR; }

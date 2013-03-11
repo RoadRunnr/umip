@@ -16,7 +16,6 @@
 #define MAX_NONCE_LIFETIME        240 /* seconds */
 #define MAX_TOKEN_LIFETIME        210 /* seconds */
 #define MAX_RR_BINDING_LIFETIME   420 /* seconds */
-#define MAX_CONSECUTIVE_RESENDS   5   /* retransmissions */
 #define PREFIX_ADV_RETRIES        3   /* retransmissions */
 #define PREFIX_ADV_TIMEOUT        3   /* seconds */
 

@@ -624,6 +624,22 @@ void conf_apply_changes(struct mip6_config *cur, struct mip6_config *new)
 		cur->MnFlushAllAtHome = new->MnFlushAllAtHome;
 	}
 
+	/* (MnMaxCnConsecutiveResends) MnMaxCnConsecutiveResends:
+	 * update the value in config */
+	if (new->MnMaxCnConsecutiveResends != cur->MnMaxCnConsecutiveResends) {
+		dbg("New MnMaxCnConsecutiveResends: %u\n",
+		    new->MnMaxCnConsecutiveResends);
+		cur->MnMaxCnConsecutiveResends = new->MnMaxCnConsecutiveResends;
+	}
+
+	/* (MnMaxHaConsecutiveResends) MnMaxHaConsecutiveResends:
+	 * update the value in config */
+	if (new->MnMaxHaConsecutiveResends != cur->MnMaxHaConsecutiveResends) {
+		dbg("New MnMaxHaConsecutiveResends: %u\n",
+		    new->MnMaxHaConsecutiveResends);
+		cur->MnMaxHaConsecutiveResends = new->MnMaxHaConsecutiveResends;
+	}
+
 	/* (SendMobPfxSols) SendMobPfxSols: update the value in config */
 	if (new->SendMobPfxSols != cur->SendMobPfxSols) {
 		dbg("New SendMobPfxSols: %s\n",

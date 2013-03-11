@@ -544,11 +544,19 @@ static void bu_resend(struct tq_elem *tqe)
 
 		if (bule->flags & IP6_MH_BU_HOME &&
 		    hai->use_dhaad && 
-		    bule->consecutive_resends > MAX_CONSECUTIVE_RESENDS) {
+		    conf.MnMaxHaConsecutiveResends > 0 &&
+		    bule->consecutive_resends > conf.MnMaxHaConsecutiveResends) {
 			struct timespec now;
 			clock_gettime(CLOCK_REALTIME, &now);
 			bule_invalidate(bule, &now, 0);
 			mn_change_ha(hai);
+			goto out;
+		}
+		if (!(bule->flags & IP6_MH_BU_HOME) &&
+		    conf.MnMaxCnConsecutiveResends > 0 &&
+		    bule->consecutive_resends > conf.MnMaxCnConsecutiveResends) {
+			MDBG("Deleting BULE (reached max consecutive resends)\n");
+			bul_delete(bule);
 			goto out;
 		}
 		mn_send_bu_msg(bule);

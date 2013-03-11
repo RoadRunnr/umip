@@ -223,6 +223,10 @@ static void conf_default(struct mip6_config *c)
 	c->SendMobPfxSols = 1;
 	c->OptimisticHandoff = 0;
 	c->NoHomeReturn = 0;
+	c->MnResetDhaadAtHome = 0;
+	c->MnFlushAllAtHome = 0;
+	c->MnMaxCnConsecutiveResends = 0;
+	c->MnMaxHaConsecutiveResends = 5;
 
 	/* HA options */
 	c->SendMobPfxAdvs = 1;
@@ -319,6 +323,10 @@ void conf_show(struct mip6_config *c)
 		    CONF_BOOL_STR(c->MnResetDhaadAtHome));
 		dbg("MnFlushAllAtHome = %s\n",
 		    CONF_BOOL_STR(c->MnFlushAllAtHome));
+		dbg("MnMaxHaConsecutiveResends = %u\n",
+		    CONF_BOOL_STR(c->MnMaxHaConsecutiveResends));
+		dbg("MnMaxCnConsecutiveResends = %u\n",
+		    CONF_BOOL_STR(c->MnMaxCnConsecutiveResends));
 		dbg("SendMobPfxSols = %s\n",
 		    CONF_BOOL_STR(c->SendMobPfxSols));
 		dbg("DoRouteOptimizationMN = %s\n",

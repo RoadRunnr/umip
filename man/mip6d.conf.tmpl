@@ -465,6 +465,31 @@ Default: disabled
 Dynamic reload: supported.
 
 .TP
+.BR "MnMaxCnConsecutiveResends " "number" ";"
+
+By default, if the MN does not receives a BA from a CN, it resends the BU
+indefinitely. Setting this option to 1 or more allows to stop trying
+after the specified number. 1 resend is the minimum, as 0 is a reserved
+value to indicate that resend should be performed indefinitely.
+
+Default: 0 (resend indefinitely)
+
+Dynamic reload: supported.
+
+.TP
+.BR "MnMaxHaConsecutiveResends " "number" ";"
+
+By default, if the MN learnt the HA address through DHAAD and did not
+receive a BA from a HA after 5 retries, it invalidates the HA and tries to
+switch to another HA. This option allows to tune the number of retry
+before switching. Note that if DHAAD is not used, this option has no
+effect, and the MN retries sending the BU indefinitely.
+
+Default: 5
+
+Dynamic reload: supported.
+
+.TP
 .BR "SendMobPfxSols " "boolean" ";"
 
 Controls whether mobile node sends Mobile Prefix Solicitations to the
