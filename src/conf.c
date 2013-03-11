@@ -324,9 +324,9 @@ void conf_show(struct mip6_config *c)
 		dbg("MnFlushAllAtHome = %s\n",
 		    CONF_BOOL_STR(c->MnFlushAllAtHome));
 		dbg("MnMaxHaConsecutiveResends = %u\n",
-		    CONF_BOOL_STR(c->MnMaxHaConsecutiveResends));
+		    c->MnMaxHaConsecutiveResends);
 		dbg("MnMaxCnConsecutiveResends = %u\n",
-		    CONF_BOOL_STR(c->MnMaxCnConsecutiveResends));
+		    c->MnMaxCnConsecutiveResends);
 		dbg("SendMobPfxSols = %s\n",
 		    CONF_BOOL_STR(c->SendMobPfxSols));
 		dbg("DoRouteOptimizationMN = %s\n",
