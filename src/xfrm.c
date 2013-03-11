@@ -1144,10 +1144,10 @@ static int xfrm_cn_init(void)
 		return -1;
 
 	/* Let Neighbor Advertisement messages bypass bindings
-	 * This policy is high priority(priory 3) not to block 
-	 * by the BlockPolicy during registration. We add both a 
-	 * MAIN and SUB policy in order to bypass the SUB block 
-	 * and the potential MAIN IPsec policies.
+	 * This policy is high priority (3) to bypass the block
+	 * policy during registration. We add both a MAIN and
+	 * SUB policy in order to bypass the SUB block and the
+	 * potential MAIN IPsec policies.
 	 */
 	set_selector(&in6addr_any, &in6addr_any,
 		     IPPROTO_ICMPV6, ND_NEIGHBOR_ADVERT, 0, 0, &sel);
