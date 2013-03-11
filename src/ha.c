@@ -1092,13 +1092,7 @@ static void *ha_recv_bu_worker(void *varg)
 
 		bcache_update_expire(bce);
 	}
-	/* bce is always valid here */
-	bcache_release_entry(bce);
-	if (!tsisset(lft))
-		bcache_delete(out.src, out.dst);
-
-	if (conf.pmgr.use_keymgm(out.dst, out.src))
-	{
+	if (conf.pmgr.use_keymgm(out.dst, out.src)) {
 		if (bu_flags & IP6_MH_BU_KEYM) {
 			ba_flags |= IP6_MH_BA_KEYM;
 		} else {
@@ -1119,6 +1113,10 @@ static void *ha_recv_bu_worker(void *varg)
 			 NIP6ADDR(out.src));
 		}
 	}
+	/* bce is always valid here */
+	bcache_release_entry(bce);
+	if (!tsisset(lft))
+		bcache_delete(out.src, out.dst);
 
 	if (ba_flags & IP6_MH_BA_KEYM) {
 		/* FUTURE */
