@@ -1260,6 +1260,7 @@ static void mn_process_cn_ba(struct ip6_mh_binding_ack *ba, ssize_t len,
 			bul_update_timer(bule);
 		} else { /* Don't resend BUs to this CN */
 			bule_invalidate(bule, &now, 1);
+			return;
 		}
 	}
 
