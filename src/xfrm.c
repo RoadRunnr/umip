@@ -679,24 +679,41 @@ int _mn_ha_ipsec_init(const struct in6_addr *haaddr,
 				     &tmpls[0], ti);
 }
 
-static int _mn_ha_ipsec_bypass_init(__attribute__ ((unused)) const struct in6_addr *haaddr,
+static int _mn_ha_ipsec_bypass_init(const struct in6_addr *haaddr,
 				    const struct in6_addr *hoa,
 				    struct ipsec_policy_entry  *e,
 				    __attribute__ ((unused)) void *arg)
 {
 	struct xfrm_selector sel;
-	int prio = MIP6_PRIO_BYPASS_BU;
+	static int installed = 0;
 	int err = 0;
 
-	/* set bypass policy for allowing MN to send BU over RO path to
-	   its CN. */
 	switch (e->type) {
+	case IPSEC_POLICY_TYPE_HOMEREGBINDING:
+		/* Bypass policy for incoming MH headers with wrong type.
+		 * MN sends BE in such case, but we have to allow these 
+		 * packets in the first place. */
+		set_selector(hoa, haaddr, IPPROTO_MH, 0, 0, 0, &sel);
+		err = xfrm_ipsec_policy_add(&sel, 0, XFRM_POLICY_IN,
+					    XFRM_POLICY_ALLOW,
+					    MIP6_PRIO_HOME_SIG_ANY,
+					    NULL, 0);
+		break;
+
 	case IPSEC_POLICY_TYPE_MH:
+		if (installed)
+			break;
+
+		/* Bypass policy for allowing MN to send BU over RO path
+		 * to its CN. We install it only once (multiple IPsec
+		 * policies may exist for multiple HAs). */
 		set_selector(&in6addr_any, hoa, IPPROTO_MH,
 			     IP6_MH_TYPE_BU, 0, 0, &sel);
 		err = xfrm_ipsec_policy_add(&sel, 0, XFRM_POLICY_OUT,
-				            XFRM_POLICY_ALLOW, prio,
+				            XFRM_POLICY_ALLOW,
+					    MIP6_PRIO_BYPASS_BU,
 					    NULL, 0);
+		installed = 1;
 		break;
 	default:
 		break;
@@ -843,20 +860,29 @@ int _mn_ha_ipsec_cleanup(const struct in6_addr *haaddr,
 	return 0;
 }
 
-static int _mn_ha_ipsec_bypass_cleanup(__attribute__ ((unused))
-				       const struct in6_addr *haaddr,
+static int _mn_ha_ipsec_bypass_cleanup(const struct in6_addr *haaddr,
 				       const struct in6_addr *hoa,
 				       struct ipsec_policy_entry *e,
 				       __attribute__ ((unused)) void *arg)
 {
 	struct xfrm_selector sel;
+	static int deleted = 0;
 	int err = 0;
 
 	switch (e->type) {
+	case IPSEC_POLICY_TYPE_HOMEREGBINDING:
+		set_selector(hoa, haaddr, IPPROTO_MH, 0, 0, 0, &sel);
+		xfrm_ipsec_policy_del(&sel, XFRM_POLICY_IN);
+		break;
+
 	case IPSEC_POLICY_TYPE_MH:
+		if (deleted)
+			break;
+
 		set_selector(&in6addr_any, hoa, IPPROTO_MH,
 			     IP6_MH_TYPE_BU, 0, 0, &sel);
 		err = xfrm_ipsec_policy_del(&sel, XFRM_POLICY_OUT);
+		deleted = 1;
 		break;
 	default:
 		break;
