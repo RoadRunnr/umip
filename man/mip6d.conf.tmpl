@@ -750,7 +750,7 @@ matching this entry.
 .SH EXAMPLES
 
 .TP
-.BR "A NEMO Home Agent example:"
+.BR "A NEMO Home Agent example (without IPsec):"
 
 .nf
 NodeConfig HA;
@@ -769,7 +769,7 @@ UseMnHaIPsec disabled;
 .fi
 
 .TP
-.BR "A NEMO Mobile Router example:"
+.BR "A NEMO Mobile Router example (without IPsec):"
 
 .nf
 NodeConfig MN;
@@ -793,7 +793,7 @@ UseMnHaIPsec disabled;
 .fi
 
 .TP
-.BR "A Correspondent Node example:"
+.BR "A Correspondent Node example (without IPsec):"
 
 .nf
 NodeConfig CN;
@@ -802,36 +802,40 @@ DoRouteOptimizationCN enabled;
 .fi
 
 .TP
-.BR "A Home Agent example:"
+.BR "A Home Agent example (with IPsec static keying):"
 
 .nf
 NodeConfig HA;
 
 Interface "eth0";
-Interface "eth1";
+
+BindingAclPolicy 3ffe:2620:6:1::1234 allow;
 
 UseMnHaIPsec enabled;
 
 IPsecPolicySet {
         HomeAgentAddress 3ffe:2620:6:1::1;
-
         HomeAddress 3ffe:2620:6:1::1234/64;
-        HomeAddress 3ffe:2620:6:1::1235/64;
 
-        IPsecPolicy HomeRegBinding UseESP;
-        IPsecPolicy TunnelMh UseESP;
+        # All MH packets (BU/BA/BERR)
+        IPsecPolicy Mh UseESP 111 112;
+        # All tunneled packets (HoTI/HoT, payload)
+        IPsecPolicy TunnelPayload UseESP 113 114;
+        # All ICMP packets (MPS/MPA, ICMPv6)
+        IPsecPolicy ICMP UseESP 115 116;
 }
 .fi
 
 .TP
-.BR "A Mobile Node example:"
+.BR "A Mobile Node example (with IPsec static keying):"
 
 .nf
 NodeConfig MN;
 
 DoRouteOptimizationCN enabled;
-
-DoRouteOptimizationMN enabled;
+# DoRouteOptimizationMN cannot be used 
+# with TunnelPayload IPsecPolicy
+DoRouteOptimizationMN disabled;
 
 UseCnBuAck enabled;
 
@@ -839,9 +843,9 @@ MnHomeLink "eth0" {
         HomeAgentAddress 3ffe:2620:6:1::1;
         HomeAddress 3ffe:2620:6:1::1234/64;
 
-        #			address			opt.
-        #MnRoPolicy	3ffe:2060:6:1::3	enabled;
-        #MnRoPolicy					disabled;
+        #           address          opt.
+        #MnRoPolicy 3ffe:2060:6:1::3 enabled;
+        #MnRoPolicy                  disabled;
 }
 
 UseMnHaIPsec enabled;
@@ -850,8 +854,12 @@ IPsecPolicySet {
         HomeAgentAddress 3ffe:2620:6:1::1;
         HomeAddress 3ffe:2620:6:1::1234/64;
 
-        IPsecPolicy HomeRegBinding UseESP;
-        IPsecPolicy TunnelMh UseESP;
+        # All MH packets (BU/BA/BERR)
+        IPsecPolicy Mh UseESP 111 112;
+        # All tunneled packets (HoTI/HoT, payload)
+        IPsecPolicy TunnelPayload UseESP 113 114;
+        # All ICMP packets (MPS/MPA, ICMPv6)
+        IPsecPolicy ICMP UseESP 115 116;
 }
 .fi
 
@@ -859,7 +867,12 @@ IPsecPolicySet {
 .BR mip6d (1),
 .BR mipv6 (7),
 .PP
-RFC3775: Mobility Support in IPv6,
+RFC6275: Mobility Support in IPv6
 .PP
 RFC3776: Using IPsec to Protect Mobile IPv6 Signaling Between Mobile
 Nodes and Home Agents
+.PP
+RFC4877: Mobile IPv6 Operation with IKEv2 and the Revised IPsec
+Architecture
+.PP
+RFC3963: Network Mobility (NEMO) Basic Support Protocol
