@@ -289,15 +289,17 @@ static void mn_recv_param_prob(const struct icmp6_hdr *ih, ssize_t len,
 		if (e->flags & IP6_MH_BU_HOME) {
 			if (!conf.UseMnHaIPsec &&
 			    !conf.MnDiscardHaParamProb) {
-				clock_gettime(CLOCK_REALTIME, &e->lastsent);
-				bule_invalidate(e, &e->lastsent, 1);
+				struct timespec now;
+				clock_gettime(CLOCK_REALTIME, &now);
+				bule_invalidate(e, &now, 1);
 			}
 		} else if (ih->icmp6_code == ICMP6_PARAMPROB_OPTION) {
 			syslog(LOG_ERR,
 			       "CN participated in RO but can't handle HAO\n");
 		} else {
-			clock_gettime(CLOCK_REALTIME, &e->lastsent);
-			bule_invalidate(e, &e->lastsent, 1);
+			struct timespec now;
+			clock_gettime(CLOCK_REALTIME, &now);
+			bule_invalidate(e, &now, 1);
 		}
 	}
 	pthread_rwlock_unlock(&mn_lock);
