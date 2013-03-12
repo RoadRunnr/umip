@@ -138,5 +138,6 @@ int conf_update(struct mip6_config *c,
 int yyparse(void);
 
 int yylex(void);
+int yylex_destroy(void);
 
 #endif

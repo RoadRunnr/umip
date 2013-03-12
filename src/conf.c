@@ -124,6 +124,9 @@ static int conf_file(struct mip6_config *c, char *filename)
 
 	fclose(yyin);
 
+	/* Free memory allocated by yyparse() */
+	yylex_destroy();
+
 	if (ret) return -EINVAL;
 
 	return 0;
