@@ -824,14 +824,12 @@ int _mn_ha_ipsec_cleanup(const struct in6_addr *haaddr,
 	struct xfrm_selector sel;
 	int ulp = 0;
 	int type_in = 0, type_out = 0;
-	int prio = MIP6_PRIO_HOME_DATA_IPSEC;
 
 	switch (e->type) {
 	case IPSEC_POLICY_TYPE_NDISC:
 		type_in = ND_NEIGHBOR_SOLICIT;
 		type_out = ND_NEIGHBOR_ADVERT;
 		ulp = IPPROTO_ICMPV6;
-		prio = MIP6_PRIO_HOME_SIG;
 		break;
 	case IPSEC_POLICY_TYPE_MOBPFXDISC:
 		type_in = MIP_PREFIX_ADVERT;
@@ -844,7 +842,6 @@ int _mn_ha_ipsec_cleanup(const struct in6_addr *haaddr,
 		type_out = IP6_MH_TYPE_BU;
 	case IPSEC_POLICY_TYPE_MH:
 		ulp = IPPROTO_MH;
-		prio = MIP6_PRIO_HOME_SIG;
 		break;
 	case IPSEC_POLICY_TYPE_ANY:
 		break;
@@ -972,7 +969,6 @@ int _ha_mn_ipsec_init(const struct in6_addr *haaddr,
 	int ulp = 0;
 	int type_in = 0, type_out = 0;
 	int prio = MIP6_PRIO_HOME_DATA_IPSEC;
-	int use_dst = 0;
 	int dir;
 
 	switch (e->type) {
@@ -993,7 +989,6 @@ int _ha_mn_ipsec_init(const struct in6_addr *haaddr,
 		type_out = IP6_MH_TYPE_BACK;
 	case IPSEC_POLICY_TYPE_MH:
 		ulp = IPPROTO_MH;
-		use_dst = 1;
 		prio = MIP6_PRIO_HOME_SIG;
 		break;
 	case IPSEC_POLICY_TYPE_BERROR:
@@ -1065,14 +1060,12 @@ int _ha_mn_ipsec_cleanup(const struct in6_addr *haaddr,
 	struct xfrm_selector sel;
 	int ulp = 0;
 	int type_in = 0, type_out = 0;
-	int prio = MIP6_PRIO_HOME_DATA_IPSEC;
 
 	switch (e->type) {
 	case IPSEC_POLICY_TYPE_NDISC:
 		type_in = ND_NEIGHBOR_ADVERT;
 		type_out = ND_NEIGHBOR_SOLICIT;
 		ulp = IPPROTO_ICMPV6;
-		prio = MIP6_PRIO_HOME_SIG;
 		break;
 	case IPSEC_POLICY_TYPE_MOBPFXDISC:
 		type_in = MIP_PREFIX_SOLICIT;
@@ -1085,13 +1078,11 @@ int _ha_mn_ipsec_cleanup(const struct in6_addr *haaddr,
 		type_out = IP6_MH_TYPE_BACK;
 	case IPSEC_POLICY_TYPE_MH:
 		ulp = IPPROTO_MH;
-		prio = MIP6_PRIO_HOME_SIG;
 		break;
 	case IPSEC_POLICY_TYPE_BERROR:
 		type_in = -1;
 		type_out = IP6_MH_TYPE_BERROR;
 		ulp = IPPROTO_MH;
-		prio = MIP6_PRIO_HOME_ERROR;
 		break;
 	case IPSEC_POLICY_TYPE_ANY:
 		break;
