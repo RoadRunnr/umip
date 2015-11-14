@@ -52,7 +52,9 @@ enum {
 	ICMP6_DRP = 6,
 	ICMP6_MPS = 7,
 	ICMP6_MPA = 8,
-	__ICMP6_SENTINEL = 9
+	ICMP6_NS  = 9,
+	ICMP6_RS  = 10,
+	__ICMP6_SENTINEL = 11
 };
 
 
@@ -64,7 +66,7 @@ struct sock {
 static pthread_rwlock_t handler_lock;
 static struct icmp6_handler *handlers[__ICMP6_SENTINEL + 1];
 
-static struct sock icmp6_sock;
+struct sock icmp6_sock;
 static pthread_t icmp6_listener;
 
 static inline int icmp6_type_map(uint8_t type)
@@ -86,6 +88,10 @@ static inline int icmp6_type_map(uint8_t type)
 		return ICMP6_MPS;
 	case MIP_PREFIX_ADVERT:
 		return ICMP6_MPA;
+	case ND_NEIGHBOR_SOLICIT:
+		return ICMP6_NS;
+	case ND_ROUTER_SOLICIT:
+		return ICMP6_RS;
 	default:
 		return __ICMP6_SENTINEL;
 	}
@@ -232,6 +238,12 @@ int icmp6_init(void)
 		ICMP6_FILTER_SETPASS(MIP_PREFIX_ADVERT, &filter);
 		ICMP6_FILTER_SETPASS(MIP_HA_DISCOVERY_REPLY, &filter);
 		ICMP6_FILTER_SETPASS(ICMP6_PARAM_PROB, &filter);
+	}
+
+	if (is_mag()) {
+		ICMP6_FILTER_SETPASS(ND_NEIGHBOR_SOLICIT, &filter);
+		ICMP6_FILTER_SETPASS(ND_NEIGHBOR_ADVERT, &filter);
+		ICMP6_FILTER_SETPASS(ND_ROUTER_SOLICIT, &filter);
 	}
 
 	if (setsockopt(icmp6_sock.fd, IPPROTO_ICMPV6, ICMP6_FILTER, 

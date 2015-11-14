@@ -114,6 +114,7 @@ static void uerror(const char *fmt, ...) {
 %union {
 	char *string;
 	struct in6_addr addr;
+	struct in6_addr macaddr;
 	char bool;
 	unsigned int num;
 	unsigned int numpair[2];
@@ -122,6 +123,7 @@ static void uerror(const char *fmt, ...) {
 
 %token <string> QSTRING
 %token <addr>	ADDR
+%token <macaddr>	MACADDR
 %token <bool>	BOOL
 %token <num>	NUMBER
 %token <dec>	DECIMAL
@@ -201,6 +203,41 @@ static void uerror(const char *fmt, ...) {
 %token		HASERVEDPREFIX
 %token		MOBRTRUSEEXPLICITMODE
 %token		CNBINDINGPOLICYSET
+/* PMIP CONF ELEMENTS */
+%token		RFC5213TIMESTAMPBASEDAPPROACHINUSE;
+%token		RFC5213MOBILENODEGENERATEDTIMESTAMPINUSE;
+%token		RFC5213FIXEDMAGLINKLOCALADDRESSONALLACCESSLINKS;
+%token		RFC5213FIXEDMAGLINKLAYERADDRESSONALLACCESSLINKS;
+%token		RFC5213MINDELAYBEFOREBCEDELETE;
+%token		RFC5213MAXDELAYBEFORENEWBCEASSIGN;
+%token		RFC5213TIMESTAMPVALIDITYWINDOW;
+%token		RFC5213ENABLEMAGLOCALROUTING
+%token		MIP6LMA
+%token		MIP6MAG
+%token		PROXYMIPLMA
+%token		PROXYMIPMAG
+%token		ALLLMAMULTICASTADDRESS
+%token		LMAPMIPNETWORKADDRESS
+%token		LMAPMIPNETWORKDEVICE
+%token		LMACORENETWORKADDRESS
+%token		LMACORENETWORKDEVICE
+%token		MAGADDRESSINGRESS
+%token		MAGADDRESSEGRESS
+%token		MAGDEVICEINGRESS
+%token		MAGDEVICEEGRESS
+%token		OURADDRESS
+%token		HOMENETWORKPREFIX
+%token		PBULIFETIME
+%token		PBALIFETIME
+%token		RETRANSMISSIONTIMEOUT
+%token		MAXMESSAGERETRANSMISSIONS
+%token		TUNNELINGENABLED
+%token		DYNAMICTUNNELINGENABLED
+%token		MAXDELAYBEFOREDYNAMICTUNNELINGDELETE
+%token		RADIUSPASSWORD
+%token		RADIUSCLIENTCONFIGFILE
+%token		PCAPSYSLOGASSOCIATIONGREPSTRING
+%token		PCAPSYSLOGDEASSOCIATIONGREPSTRING
 
 %token		INV_TOKEN
 
@@ -390,11 +427,14 @@ topdef		: MIP6ENTITY mip6entity ';'
 			conf_parsed->NoHomeReturn = $2;
 		}
 		| CNBINDINGPOLICYSET  '{' cnbindingpoldefs '}'
+		| PROXYMIPLMA proxymiplmadef
+		| PROXYMIPMAG proxymipmagdef
 		;
 
 mip6entity	: MIP6CN { $$ = MIP6_ENTITY_CN;	}
 		| MIP6MN { $$ = MIP6_ENTITY_MN; }
 		| MIP6HA { $$ = MIP6_ENTITY_HA; }
+		| MIP6MAG { $$ = MIP6_ENTITY_MAG; }
 		;
 
 ifacedef	: QSTRING ifacesub
@@ -844,6 +884,256 @@ prefixlistentry	: ADDR '/' prefixlen
 			p->ple_prefix = $1;
 			p->ple_plen = $3;
 			list_add_tail(&p->list, &prefixes);
+		}
+		;
+
+proxymiplmadef	: QSTRING proxymiplmasub
+		{
+			conf_parsed->HomeNetworkPrefix = in6addr_any;
+			conf_parsed->OurAddress        = in6addr_loopback;
+		}
+		;
+
+proxymiplmasub	: '{' proxymiplmaopts '}'
+		| ';'
+		;
+
+proxymiplmaopts	: proxymiplmaopt
+		| proxymiplmaopts proxymiplmaopt
+		;
+
+proxymiplmaopt	: LMAPMIPNETWORKADDRESS ADDR ';'
+		{
+			memcpy(&conf_parsed->LmaAddress, &$2, sizeof(struct in6_addr));
+		}
+		| LMAPMIPNETWORKDEVICE QSTRING ';'
+		{
+			conf_parsed->LmaPmipNetworkDevice = $2;
+		}
+                | LMACORENETWORKADDRESS ADDR ';'
+		{
+			memcpy(&conf_parsed->LmaCoreNetworkAddress, &$2, sizeof(struct in6_addr));
+		}
+		| LMACORENETWORKDEVICE QSTRING ';'
+		{
+			conf_parsed->LmaCoreNetworkDevice = $2;
+		}
+		| RFC5213TIMESTAMPBASEDAPPROACHINUSE BOOL ';'
+		{
+			conf_parsed->RFC5213TimestampBasedApproachInUse = $2;
+		}
+		| RFC5213MOBILENODEGENERATEDTIMESTAMPINUSE BOOL ';'
+		{
+			conf_parsed->RFC5213MobileNodeGeneratedTimestampInUse = $2;
+		}
+		| RFC5213FIXEDMAGLINKLOCALADDRESSONALLACCESSLINKS ADDR ';'
+		{
+			memcpy(&conf_parsed->RFC5213FixedMAGLinkLocalAddressOnAllAccessLinks, &$2, sizeof(struct in6_addr));
+		}
+		| RFC5213FIXEDMAGLINKLAYERADDRESSONALLACCESSLINKS  MACADDR ';'
+		{
+			memcpy(&conf_parsed->RFC5213FixedMAGLinkLayerAddressOnAllAccessLinks, &$2, sizeof(struct in6_addr));
+		}
+		| RFC5213MINDELAYBEFOREBCEDELETE NUMBER ';'
+		{
+			struct timespec lifetime;
+			lifetime.tv_sec = $2/1000;
+			lifetime.tv_nsec = ($2 % 1000)*1000000;
+			conf_parsed->RFC5213MinDelayBeforeBCEDelete = lifetime;
+		}
+		| RFC5213MAXDELAYBEFORENEWBCEASSIGN NUMBER ';'
+		{
+			struct timespec lifetime;
+			lifetime.tv_sec = $2/1000;
+			lifetime.tv_nsec = ($2 % 1000)*1000000;
+			conf_parsed->RFC5213MaxDelayBeforeNewBCEAssign = lifetime;
+		}
+		| RFC5213TIMESTAMPVALIDITYWINDOW NUMBER ';'
+		{
+			struct timespec lifetime;
+			lifetime.tv_sec = $2/1000;
+			lifetime.tv_nsec = ($2 % 1000)*1000000;
+			conf_parsed->RFC5213TimestampValidityWindow = lifetime;
+		}
+		| OURADDRESS ADDR ';'
+		{
+			memcpy(&conf_parsed->OurAddress, &$2, sizeof(struct in6_addr));
+		}
+		| HOMENETWORKPREFIX ADDR ';'
+		{
+			memcpy(&conf_parsed->HomeNetworkPrefix, &$2, sizeof(struct in6_addr));
+		}
+		| TUNNELINGENABLED BOOL ';'
+		{
+			conf_parsed->TunnelingEnabled = $2;
+		}
+		| DYNAMICTUNNELINGENABLED BOOL ';'
+		{
+			conf_parsed->DynamicTunnelingEnabled = $2;
+		}
+		| MAXDELAYBEFOREDYNAMICTUNNELINGDELETE NUMBER ';'
+		{
+			struct timespec lifetime;
+			lifetime.tv_sec = $2/1000;
+			lifetime.tv_nsec = ($2 % 1000)*1000000;
+			conf_parsed->MaxDelayBeforeDynamicTunnelingDelete = lifetime;
+		}
+		| PBULIFETIME NUMBER ';'
+		{
+			struct timespec lifetime;
+			lifetime.tv_sec = $2/1000;
+			lifetime.tv_nsec = ($2 % 1000)*1000000;
+			conf_parsed->PBULifeTime = lifetime;
+		}
+		| PBALIFETIME NUMBER ';'
+		{
+			struct timespec lifetime;
+			lifetime.tv_sec = $2/1000;
+			lifetime.tv_nsec = ($2 % 1000)*1000000;
+			conf_parsed->PBALifeTime = lifetime;
+		}
+		| RETRANSMISSIONTIMEOUT NUMBER ';'
+		{
+			struct timespec lifetime;
+			lifetime.tv_sec = $2/1000;
+			lifetime.tv_nsec = ($2 % 1000)*1000000;
+			conf_parsed->RetransmissionTimeOut = lifetime;
+		}
+		| MAXMESSAGERETRANSMISSIONS NUMBER ';'
+		{
+			conf_parsed->MaxMessageRetransmissions = $2;
+		}
+		| MAGADDRESSINGRESS ADDR ';'
+		{
+			memcpy(&conf_parsed->MagAddressIngress[conf_parsed->NumMags], &$2, sizeof(struct in6_addr));
+		}
+		| MAGADDRESSEGRESS ADDR ';'
+		{
+			memcpy(&conf_parsed->MagAddressEgress[conf_parsed->NumMags], &$2, sizeof(struct in6_addr));
+			if (! IN6_IS_ADDR_UNSPECIFIED(&conf_parsed->MagAddressEgress[conf_parsed->NumMags])) {
+				conf_parsed->NumMags = conf_parsed->NumMags + 1;
+			}
+		}
+		;
+
+proxymipmagdef	: QSTRING proxymipmagsub
+		{
+			conf_parsed->HomeNetworkPrefix = in6addr_any;
+			conf_parsed->OurAddress        = in6addr_loopback;
+		}
+		;
+
+proxymipmagsub	: '{' proxymipmagopts '}'
+		| ';'
+		;
+
+proxymipmagopts	: proxymipmagopt
+		| proxymipmagopts proxymipmagopt
+		;
+
+proxymipmagopt	: LMAPMIPNETWORKADDRESS ADDR ';'
+		{
+			memcpy(&conf_parsed->LmaAddress, &$2, sizeof(struct in6_addr));
+		}
+		| RFC5213TIMESTAMPBASEDAPPROACHINUSE BOOL ';'
+		{
+			conf_parsed->RFC5213TimestampBasedApproachInUse = $2;
+		}
+		| RFC5213MOBILENODEGENERATEDTIMESTAMPINUSE BOOL ';'
+		{
+			conf_parsed->RFC5213MobileNodeGeneratedTimestampInUse = $2;
+		}
+		| RFC5213FIXEDMAGLINKLOCALADDRESSONALLACCESSLINKS ADDR ';'
+		{
+			memcpy(&conf_parsed->RFC5213FixedMAGLinkLocalAddressOnAllAccessLinks, &$2, sizeof(struct in6_addr));
+		}
+		| RFC5213FIXEDMAGLINKLAYERADDRESSONALLACCESSLINKS MACADDR ';'
+		{
+			memcpy(&conf_parsed->RFC5213FixedMAGLinkLayerAddressOnAllAccessLinks, &$2, sizeof(struct in6_addr));
+		}
+		| RFC5213ENABLEMAGLOCALROUTING BOOL ';'
+		{
+			conf_parsed->RFC5213EnableMAGLocalRouting = $2;
+		}
+		| OURADDRESS ADDR ';'
+		{
+			memcpy(&conf_parsed->OurAddress, &$2, sizeof(struct in6_addr));
+		}
+		| MAGADDRESSINGRESS ADDR ';'
+		{
+			memcpy(&conf_parsed->MagAddressIngress[0], &$2, sizeof(struct in6_addr));
+		}
+		| MAGADDRESSEGRESS ADDR ';'
+		{
+			memcpy(&conf_parsed->MagAddressEgress[0], &$2, sizeof(struct in6_addr));
+		}
+		| MAGDEVICEINGRESS QSTRING ';'
+		{
+			conf_parsed->MagDeviceIngress = $2;
+		}
+		| MAGDEVICEEGRESS QSTRING ';'
+		{
+			conf_parsed->MagDeviceEgress = $2;
+		}
+		| HOMENETWORKPREFIX ADDR ';'
+		{
+			memcpy(&conf_parsed->HomeNetworkPrefix, &$2, sizeof(struct in6_addr));
+		}
+		| TUNNELINGENABLED BOOL ';'
+		{
+			conf_parsed->TunnelingEnabled = $2;
+		}
+		| DYNAMICTUNNELINGENABLED BOOL ';'
+		{
+			conf_parsed->DynamicTunnelingEnabled = $2;
+		}
+		| MAXDELAYBEFOREDYNAMICTUNNELINGDELETE NUMBER ';'
+		{
+			struct timespec lifetime;
+			lifetime.tv_sec = $2/1000;
+			lifetime.tv_nsec = ($2 % 1000)*1000000;
+			conf_parsed->MaxDelayBeforeDynamicTunnelingDelete = lifetime;
+		}
+		| PBULIFETIME NUMBER ';'
+		{
+			struct timespec lifetime;
+			lifetime.tv_sec = $2/1000;
+			lifetime.tv_nsec = ($2 % 1000)*1000000;
+			conf_parsed->PBULifeTime = lifetime;
+		}
+		| PBALIFETIME NUMBER ';'
+		{
+			struct timespec lifetime;
+			lifetime.tv_sec = $2/1000;
+			lifetime.tv_nsec = ($2 % 1000)*1000000;
+			conf_parsed->PBALifeTime = lifetime;
+		}
+		| RETRANSMISSIONTIMEOUT NUMBER ';'
+		{
+			struct timespec lifetime;
+			lifetime.tv_sec = $2/1000;
+			lifetime.tv_nsec = ($2 % 1000)*1000000;
+			conf_parsed->RetransmissionTimeOut = lifetime;
+		}
+		| MAXMESSAGERETRANSMISSIONS NUMBER ';'
+		{
+			conf_parsed->MaxMessageRetransmissions = $2;
+		}
+		| RADIUSPASSWORD QSTRING ';'
+		{
+			conf_parsed->RadiusPassword = $2;
+		}
+		| RADIUSCLIENTCONFIGFILE QSTRING ';'
+		{
+			conf_parsed->RadiusClientConfigFile = $2;
+		}
+		| PCAPSYSLOGASSOCIATIONGREPSTRING QSTRING ';'
+		{
+			conf_parsed->PcapSyslogAssociationGrepString = $2;
+		}
+		| PCAPSYSLOGDEASSOCIATIONGREPSTRING QSTRING ';'
+		{
+			conf_parsed->PcapSyslogDeAssociationGrepString = $2;
 		}
 		;
 %%

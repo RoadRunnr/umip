@@ -77,6 +77,8 @@ int vt_bul_init(void);
 
 int vt_bc_init(void);
 
+int vt_pbc_init(void);
+
 int vt_init(void);
 void vt_fini(void);
 

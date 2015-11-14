@@ -2,7 +2,7 @@
 ## Process this file with automake to produce Makefile.in
 
 AM_CFLAGS = -Wall -Wextra -Wpointer-arith -Wreturn-type -pedantic -std=gnu99
-AM_CPPFLAGS = -isystem $(top_srcdir)/include
+AM_CPPFLAGS = -isystem $(top_srcdir)/include -I../src -I./pmip -I/usr/local/include
 AM_YFLAGS = -d
 
 defpath.h: $(top_builddir)/config.h
@@ -49,7 +49,31 @@ mip6d_SOURCES = pmgr.c pmgr.h defpath.h \
 		proc_sys.c proc_sys.h \
 		prefix.c prefix.h \
 		ipsec.c ipsec.h \
-		statistics.h
+		statistics.h \
+		./pmip/pmip.h \
+		./pmip/pmip_cache.c \
+		./pmip/pmip_cache.h \
+		./pmip/pmip_config.h \
+		./pmip/pmip_consts.h \
+		./pmip/pmip_fsm.c \
+		./pmip/pmip_fsm.h \
+		./pmip/pmip_handler.c \
+		./pmip/pmip_handler.h \
+		./pmip/pmip_hnp_cache.c \
+		./pmip/pmip_hnp_cache.h \
+		./pmip/pmip_init.c \
+		./pmip/pmip_init.h \
+		./pmip/pmip_lma_proc.c \
+		./pmip/pmip_lma_proc.h \
+		./pmip/pmip_mag_proc.c \
+		./pmip/pmip_mag_proc.h \
+		./pmip/pmip_msgs.c \
+		./pmip/pmip_msgs.h \
+		./pmip/pmip_pcap.c \
+		./pmip/pmip_pcap.h \
+		./pmip/pmip_tunnel.c \
+		./pmip/pmip_tunnel.h \
+		./pmip/pmip_types.h
 
 if ENABLE_VT
 mip6d_SOURCES += vt.c vt.h
@@ -59,7 +83,11 @@ if BUILTIN_CRYPTO
 mip6d_SOURCES += crypto.c crypto.h
 endif
 
-mip6d_LDADD = 
+mip6d_LDADD =  -lpcap
+if USE_RADIUS
+mip6d_LDADD += -lfreeradius-client
+AM_CFLAGS    += -DUSE_RADIUS
+endif
 
 if MISSING
 mip6d_LDADD += -L$(top_builddir)/libmissing -lmissing

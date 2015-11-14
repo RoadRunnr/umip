@@ -5,12 +5,20 @@
 
 #include <netinet/in.h>
 #include <netinet/ip6mh.h>
+#include "pmip_consts.h"
+
 
 #define MIP6_SEQ_GT(x,y) ((short int)(((uint16_t)(x)) - ((uint16_t)(y))) > 0)
 
 /* If new types or options appear, these should be updated. */
-#define IP6_MH_TYPE_MAX IP6_MH_TYPE_BERROR
-#define IP6_MHOPT_MAX IP6_MHOPT_MOB_NET_PRFX
+//For PMIP
+#define IP6_MH_TYPE_MAX IP6_MH_TYPE_PBRES
+#define IP6_MHOPT_MAX IP6_MHOPT_PMIP_MAX
+
+struct sock {
+    pthread_mutex_t send_mutex;
+    int fd;
+};
 
 struct in6_addr_bundle {
 	struct in6_addr *src;

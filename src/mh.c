@@ -53,6 +53,7 @@
 #include "keygen.h"
 #include "prefix.h"
 #include "statistics.h"
+#include "pmip_types.h"
 
 #define MH_DEBUG_LEVEL 1
 
@@ -62,12 +63,7 @@
 #define MDBG(...)
 #endif
 
-struct sock {
-	pthread_mutex_t send_mutex;
-	int fd;
-};
-
-static struct sock mh_sock;
+struct sock mh_sock;
 
 /* Are duplicate options allowed */
 int mh_opts_dup_ok[] = {

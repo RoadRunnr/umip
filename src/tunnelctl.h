@@ -33,4 +33,5 @@ int tunnelctl_init(void);
 
 void tunnelctl_cleanup(void);
 
+int tunnel_getusers(int tun_index);
 #endif

@@ -461,3 +461,14 @@ void tunnelctl_cleanup(void)
 	pthread_mutex_unlock(&tnl_lock);
 	close(tnl_fd);
 }
+
+int tunnel_getusers(int tun_index)
+{
+    struct mip6_tnl *tnl;
+    int usercount = -1;
+    pthread_mutex_lock(&tnl_lock);
+    if ((tnl = get_tnl(tun_index)) != NULL) usercount = tnl->users;
+    pthread_mutex_unlock(&tnl_lock);
+    return usercount;
+}
+

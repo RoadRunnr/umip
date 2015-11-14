@@ -98,6 +98,8 @@ struct md_inet6_iface {
 	int ll_dad_unsafe;
 	int is_tunnel;
 	unsigned short type;
+	short hwalen;
+	uint8_t hwa[16];
 	int32_t devconf[DEVCONF_MAX];
 	int32_t app_solicit;
 	struct timespec reachable;

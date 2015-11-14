@@ -65,6 +65,43 @@ struct mip6_config {
 	/* CN options */
 	char DoRouteOptimizationCN;
 	struct list_head cn_binding_pol;
+
+	/* PMIP global options */
+	unsigned int    RFC5213TimestampBasedApproachInUse;
+	unsigned int    RFC5213MobileNodeGeneratedTimestampInUse;
+	struct in6_addr RFC5213FixedMAGLinkLocalAddressOnAllAccessLinks;
+	struct in6_addr RFC5213FixedMAGLinkLayerAddressOnAllAccessLinks;
+
+	/* PMIP LMA options */
+	struct timespec RFC5213MinDelayBeforeBCEDelete;
+	struct timespec RFC5213MaxDelayBeforeNewBCEAssign;
+	struct timespec RFC5213TimestampValidityWindow;
+
+	/* PMIP MAG options */
+	unsigned int    RFC5213EnableMAGLocalRouting;
+	struct in6_addr LmaAddress;                 // address of LMA, PMIP network side.
+	char*           LmaPmipNetworkDevice;       // PMIP LMA device, PMIP network side.
+	struct in6_addr LmaCoreNetworkAddress;      // address of LMA, core network side.
+	char*           LmaCoreNetworkDevice;       // PMIP LMA device, core network side.
+	unsigned int    NumMags;
+	#define PMIP_MAX_MAGS    64
+	struct in6_addr MagAddressIngress[PMIP_MAX_MAGS]; // ingress address of MAG.
+	struct in6_addr MagAddressEgress[PMIP_MAX_MAGS];  // egress address of MAG.
+	char*           MagDeviceIngress;           // ingress device.
+	char*           MagDeviceEgress;            // egress device.
+	struct in6_addr OurAddress;
+	struct in6_addr HomeNetworkPrefix;          // home network address common for domain!
+	struct timespec PBULifeTime;                // Life time of Proxy Binding Update.
+	struct timespec PBALifeTime;                // Life time MR side.
+	struct timespec RetransmissionTimeOut;      // Time-out before retransmission of a message.
+	int             MaxMessageRetransmissions;  //indicates the maximum number of message retransmissions
+	char            TunnelingEnabled;
+	char            DynamicTunnelingEnabled;
+	struct timespec MaxDelayBeforeDynamicTunnelingDelete;
+	char*           RadiusClientConfigFile;
+	char*           RadiusPassword;
+	char*           PcapSyslogAssociationGrepString;
+	char*           PcapSyslogDeAssociationGrepString;
 };
 
 struct net_iface {
@@ -84,6 +121,7 @@ extern struct mip6_config *conf_parsed;
 #define MIP6_ENTITY_CN 0
 #define MIP6_ENTITY_MN 1
 #define MIP6_ENTITY_HA 2
+#define MIP6_ENTITY_MAG 3
 
 static inline int is_cn(void)
 {
@@ -99,6 +137,12 @@ static inline int is_ha(void)
 {
 	return conf.mip6_entity == MIP6_ENTITY_HA;
 }
+
+static inline int is_mag(void)
+{
+	return conf.mip6_entity == MIP6_ENTITY_MAG;
+}
+
 
 static inline int is_if_entity_set(struct net_iface *i)
 {
@@ -123,6 +167,13 @@ static inline int is_if_ha(struct net_iface *i)
 {
 	return (is_ha() &&
 		(!is_if_entity_set(i) || i->mip6_if_entity == MIP6_ENTITY_HA));
+}
+
+
+static inline int is_if_mag(struct net_iface *i)
+{
+	return (is_mag() &&
+            (!is_if_entity_set(i) || i->mip6_if_entity == MIP6_ENTITY_MAG));
 }
 
 int conf_parse(struct mip6_config *c, int argc, char **argv);

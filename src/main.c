@@ -60,6 +60,7 @@
 #endif
 #include "tunnelctl.h"
 #include "statistics.h"
+#include "pmip.h"
 
 static void sig_child(__attribute__ ((unused)) int unused)
 {
@@ -89,6 +90,7 @@ static void terminate(void)
 	/* got SIGINT, cleanup and exit */
 	syslog(LOG_INFO, "terminated (SIGINT)");
 	dbg("got SIGINT, exiting\n");
+	pmip_cleanup();
 	debug_close();
 	pthread_exit(NULL);
 }
@@ -174,10 +176,11 @@ static void *sigh(__attribute__ ((unused)) void *arg)
 	pthread_exit(NULL);
 }
 
-const char *entity_string[3] = {
+const char *entity_string[4] = {
 	"Correspondent Node",
 	"Mobile Node",
-	"Home Agent" };
+	"Home Agent-Local Mobility Anchor",
+	"Mobile Access Gateway"};
 
 int main(int argc, char **argv)
 {
@@ -256,12 +259,16 @@ int main(int argc, char **argv)
 		goto xfrm_failed;
 	if (cn_init() < 0)
 		goto cn_failed;
-	if ((is_ha() || is_mn()) && tunnelctl_init() < 0)
+	if ((is_ha() || is_mn() ||  is_mag()) && tunnelctl_init() < 0)
 		goto tunnelctl_failed;
 	if (is_ha() && ha_init() < 0) 
-		goto ha_failed;
+		goto pmip_failed;
+		//goto ha_failed;
 	if (is_mn() && mn_init() < 0)
 		goto mn_failed;
+	if (is_mag() && pmip_mag_init() < 0)
+		goto pmip_failed;
+
 #ifdef ENABLE_VT
 	if (vt_start(conf.vt_hostname, conf.vt_service) < 0)
 		goto vt_start_failed;
@@ -277,6 +284,8 @@ vt_start_failed:
 #endif
 	if (is_mn())
 		mn_cleanup();
+pmip_failed:
+	pmip_cleanup();
 mn_failed:
 	if (is_ha())
 		ha_cleanup();

@@ -12,6 +12,11 @@
 #define RT6_TABLE_MIP6 252
 #define RT6_TABLE_MAIN 254
 
+// Defined for Proxy MIPv6//////////////////
+#define RT6_TABLE_PMIP 200
+#define IP6_RULE_PRIO_PMIP6_FWD   1000
+///////////////////////////////////////////
+
 #define IP6_RT_PRIO_MIP6_OUT 128
 #define IP6_RT_PRIO_MIP6_FWD 192
 #define IP6_RT_PRIO_ADDRCONF 256
